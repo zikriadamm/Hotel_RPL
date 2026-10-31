@@ -101,6 +101,20 @@ class DatabaseSeeder extends Seeder
             'status_kebersihan' => 'Kotor', // Kamar kotor siap dibersihkan untuk demo Petugas Kebersihan
         ]);
 
+        $kamar104 = Kamar::updateOrCreate(['nomor_kamar' => '104'], [
+            'tipe' => 'Standar',
+            'harga_per_malam' => 350000,
+            'status' => 'Tersedia',
+            'status_kebersihan' => 'Bersih',
+        ]);
+
+        $kamar105 = Kamar::updateOrCreate(['nomor_kamar' => '105'], [
+            'tipe' => 'Standar',
+            'harga_per_malam' => 320000,
+            'status' => 'Tersedia',
+            'status_kebersihan' => 'Bersih',
+        ]);
+
         $kamar201 = Kamar::updateOrCreate(['nomor_kamar' => '201'], [
             'tipe' => 'Deluxe',
             'harga_per_malam' => 550000,
@@ -122,6 +136,20 @@ class DatabaseSeeder extends Seeder
             'status_kebersihan' => 'Bersih',
         ]);
 
+        $kamar204 = Kamar::updateOrCreate(['nomor_kamar' => '204'], [
+            'tipe' => 'Deluxe',
+            'harga_per_malam' => 620000,
+            'status' => 'Tersedia',
+            'status_kebersihan' => 'Bersih',
+        ]);
+
+        $kamar205 = Kamar::updateOrCreate(['nomor_kamar' => '205'], [
+            'tipe' => 'Deluxe',
+            'harga_per_malam' => 580000,
+            'status' => 'Tersedia',
+            'status_kebersihan' => 'Bersih',
+        ]);
+
         $kamar301 = Kamar::updateOrCreate(['nomor_kamar' => '301'], [
             'tipe' => 'Suite',
             'harga_per_malam' => 950000,
@@ -132,6 +160,20 @@ class DatabaseSeeder extends Seeder
         $kamar302 = Kamar::updateOrCreate(['nomor_kamar' => '302'], [
             'tipe' => 'Suite',
             'harga_per_malam' => 950000,
+            'status' => 'Tersedia',
+            'status_kebersihan' => 'Bersih',
+        ]);
+
+        $kamar303 = Kamar::updateOrCreate(['nomor_kamar' => '303'], [
+            'tipe' => 'Suite',
+            'harga_per_malam' => 1250000,
+            'status' => 'Tersedia',
+            'status_kebersihan' => 'Bersih',
+        ]);
+
+        $kamar304 = Kamar::updateOrCreate(['nomor_kamar' => '304'], [
+            'tipe' => 'Suite',
+            'harga_per_malam' => 1450000,
             'status' => 'Tersedia',
             'status_kebersihan' => 'Bersih',
         ]);

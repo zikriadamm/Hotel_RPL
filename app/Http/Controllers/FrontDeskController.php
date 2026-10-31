@@ -105,6 +105,17 @@ class FrontDeskController extends Controller
             return back()->with('error', 'Kamar nomor ' . $kamar->nomor_kamar . ' sedang tidak tersedia untuk dipesan.');
         }
 
+        // Cek bentrok tanggal reservasi (cegah double booking)
+        $bentrok = Pemesanan::where('kamar_id', $kamar->id)
+            ->whereIn('status', ['Dipesan', 'Check-in'])
+            ->where('tanggal_check_in', '<', $validated['tanggal_check_out'])
+            ->where('tanggal_check_out', '>', $validated['tanggal_check_in'])
+            ->exists();
+
+        if ($bentrok) {
+            return back()->with('error', 'Kamar nomor ' . $kamar->nomor_kamar . ' sudah memiliki reservasi aktif pada rentang tanggal tersebut.');
+        }
+
         $checkIn = Carbon::parse($validated['tanggal_check_in']);
         $checkOut = Carbon::parse($validated['tanggal_check_out']);
         $durasiMalam = max(1, $checkIn->diffInDays($checkOut));
@@ -160,15 +171,17 @@ class FrontDeskController extends Controller
         $kembalian = $validated['jumlah_bayar'] - $pemesanan->total_harga;
 
         DB::transaction(function () use ($pemesanan, $validated, $kembalian) {
-            // 1. Simpan bukti pembayaran
-            Pembayaran::create([
-                'pemesanan_id' => $pemesanan->id,
-                'tanggal_bayar' => now(),
-                'metode_pembayaran' => $validated['metode_pembayaran'],
-                'jumlah_bayar' => $validated['jumlah_bayar'],
-                'kembalian' => $kembalian,
-                'penerima_id' => auth()->id(),
-            ]);
+            // 1. Simpan bukti pembayaran jika belum dibayar via QRIS/online
+            if (!$pemesanan->pembayaran) {
+                Pembayaran::create([
+                    'pemesanan_id' => $pemesanan->id,
+                    'tanggal_bayar' => now(),
+                    'metode_pembayaran' => $validated['metode_pembayaran'],
+                    'jumlah_bayar' => $validated['jumlah_bayar'],
+                    'kembalian' => $kembalian,
+                    'penerima_id' => auth()->id(),
+                ]);
+            }
 
             // 2. Ubah status pemesanan menjadi Check-out
             $pemesanan->update(['status' => 'Check-out']);

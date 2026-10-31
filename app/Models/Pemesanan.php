@@ -48,8 +48,6 @@ class Pemesanan extends Model
 
     public static function generateKodeBooking(): string
     {
-        $prefix = 'BKG-' . date('Ymd') . '-';
-        $countToday = self::whereDate('created_at', today())->count() + 1;
-        return $prefix . str_pad($countToday, 3, '0', STR_PAD_LEFT);
+        return 'BKG-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(2)));
     }
 }
