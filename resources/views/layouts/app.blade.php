@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Lumina Grand') — Sistem Operasional Hotel</title>
+    <title>@yield('title', 'ZSL Residence') — Sistem Operasional Hotel</title>
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="48x48">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ asset('site.webmanifest') }}">
+    <meta name="theme-color" content="#0F1D38">
     
     <!-- Google Fonts: Plus Jakarta Sans & Yellowtail -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -100,14 +105,11 @@
                 @endphp
                 <div class="flex items-center space-x-3">
                     <a href="{{ $brandTarget }}" class="flex items-center space-x-3 group">
-                        <div class="w-10 h-10 rounded-xl bg-navy-900 border border-gold-500/30 flex items-center justify-center text-gold-300 shadow-sm group-hover:bg-navy-800 transition">
-                            <!-- Architectural Geometric Hotel Icon -->
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                            </svg>
+                        <div class="w-10 h-10 rounded-xl bg-navy-900 border border-gold-500/30 flex items-center justify-center p-1.5 shadow-sm group-hover:bg-navy-800 transition">
+                            <img src="{{ asset('brand/zsl-residence/source/zsl-symbol-on-dark.svg') }}" alt="Logo ZSL Residence" class="w-full h-full object-contain">
                         </div>
                         <div>
-                            <span class="font-bold text-lg tracking-wider text-navy-900 block leading-tight">LUMINA GRAND</span>
+                            <span class="font-bold text-lg tracking-wider text-navy-900 block leading-tight">ZSL RESIDENCE</span>
                             <span class="text-[10px] uppercase font-bold text-gold-600 tracking-widest block">Operasional &bull; HotelOps</span>
                         </div>
                     </a>
@@ -300,7 +302,7 @@
 
         <!-- Subtle Footer -->
         <footer class="px-8 py-4 border-t border-warm-200 text-center text-xs text-navy-800/60 no-print mt-auto bg-warm-100/60">
-            &copy; {{ date('Y') }} Lumina Grand Hotel &amp; Resor &bull; Sistem Manajemen Operasional Hotel
+            &copy; {{ date('Y') }} ZSL Residence Hotel &amp; Resor &bull; Sistem Manajemen Operasional Hotel
         </footer>
     </div>
 

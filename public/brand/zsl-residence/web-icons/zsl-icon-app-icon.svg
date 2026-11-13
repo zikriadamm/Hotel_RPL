@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256"><title>ZSL Residence Icon</title><rect width="256" height="256" rx="57.6" fill="#0F1D38"/><g transform="translate(33.92 35.39) scale(0.735)" fill="#FCFAF7">
+  <title id="title">ZSL Residence small favicon symbol</title>
+  <g id="symbol">
+    <path fill="#FCFAF7" d="M 24 122 A 104 104 0 0 1 232 122 H 204 A 76 76 0 0 0 52 122 Z"/>
+    <path fill="#FCFAF7" d="M 24 136 H 84 V 154 L 50.5 212 H 84 V 232 H 24 V 214 L 58.6 154 H 24 Z"/>
+    <path fill="#FCFAF7" d="M 157 164 H 136 C 135 155 132 152 126 152 C 119 152 116 156 116 162 C 116 169 122 173 133 178 C 151 185 159 194 159 208 C 159 224 147 234 127 234 C 107 234 96 224 95 206 H 115 C 116 214 120 217 128 217 C 136 217 139 214 139 207 C 139 199 134 195 122 190 C 104 183 96 174 96 160 C 96 143 108 134 126 134 C 145 134 155 145 157 164 Z"/>
+    <path fill="#FCFAF7" d="M 174 136 H 196 V 212 H 232 V 232 H 174 Z"/>
+  </g>
+</g></svg>

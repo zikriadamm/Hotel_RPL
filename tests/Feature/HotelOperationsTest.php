@@ -457,7 +457,7 @@ class HotelOperationsTest extends TestCase
             ->assertSee('Villa Royal Garden Pavilion')
             ->assertSee('Penthouse Presidensial 360°')
             ->assertSee('Royal Imperial Sky Villa')
-            ->assertSee('The Lumina Grand Residence')
+            ->assertSee('The ZSL Residence')
             ->assertSee('Lihat Fasilitas &amp; Pesan', false)
             ->assertSee('Daftar Fasilitas Lengkap Kamar')
             ->assertSee('Pesan Kamar Ini');

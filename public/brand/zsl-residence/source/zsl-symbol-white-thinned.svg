@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="title">
+  <title id="title">ZSL Residence reversed white symbol</title>
+  <g id="symbol">
+    <path fill="#FFFFFF" d="M 39 114 A 89 89 0 0 1 217 114 H 200 A 72 72 0 0 0 56 114 Z"/>
+    <path fill="#FFFFFF" d="M 39 125 H 89 V 137 L 61.3 185 H 89 V 197 H 39 V 185 L 66.7 137 H 39 Z"/>
+    <path fill="#FFFFFF" d="M 153 146 H 138 C 137 139 134 136 128 136 C 122 136 119 140 119 145 C 119 151 124 154 134 158 C 149 164 155 172 155 183 C 155 193 145 199 128 199 C 111 199 101 192 100 179 H 115 C 116 185 121 188 128 188 C 135 188 138 185 138 180 C 138 174 134 171 123 167 C 108 161 102 154 102 143 C 102 131 112 123 128 123 C 144 123 151 132 153 146 Z"/>
+    <path fill="#FFFFFF" d="M 171 125 H 188 V 185 H 217 V 197 H 171 Z"/>
+    <rect fill="#FFFFFF" x="39" y="211" width="70" height="18"/>
+    <rect fill="#FFFFFF" x="147" y="211" width="70" height="18"/>
+  </g>
+</svg>

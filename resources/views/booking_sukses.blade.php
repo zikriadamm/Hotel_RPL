@@ -24,9 +24,9 @@
         <!-- Header Brand -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b-2 border-navy-900 pb-6 mb-6">
             <div>
-                <div class="flex items-center space-x-2 mb-1">
-                    <span class="w-2.5 h-2.5 rounded-full bg-gold-500"></span>
-                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-navy-900">LUMINA GRAND</h1>
+                <div class="flex items-center space-x-3 mb-1">
+                    <img src="{{ asset('brand/zsl-residence/source/zsl-symbol-master-color.svg') }}" alt="Logo ZSL Residence" class="w-9 h-9 object-contain">
+                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-navy-900">ZSL RESIDENCE</h1>
                 </div>
                 <p class="text-xs text-gold-600 font-bold uppercase tracking-wider">Hotel &amp; Resor Bintang Lima</p>
                 <p class="text-[11px] text-stone-500 mt-1">Jl. Pariwisata Raya No. 45, Indonesia &bull; Telp: (021) 7654321</p>
@@ -140,12 +140,12 @@
             <h4 class="font-bold text-navy-900 text-xs uppercase tracking-wider">Petunjuk &amp; Ketentuan Check-In:</h4>
             <p>&bull; Harap membawa dan memperlihatkan kartu identitas resmi (KTP / Paspor) yang sesuai dengan nama pemesan.</p>
             <p>&bull; Pembayaran tagihan dapat diselesaikan langsung di meja resepsionis saat kedatangan (Tunai, Debit/Kredit, atau QRIS).</p>
-            <p>&bull; Layanan bantuan Concierge 24 Jam: <strong>+62 812 3456 7890</strong> atau email ke <strong>layanan@luminagrand.com</strong>.</p>
+            <p>&bull; Layanan bantuan Concierge 24 Jam: <strong>+62 812 3456 7890</strong> atau email ke <strong>layanan@zslresidence.com</strong>.</p>
         </div>
 
         <!-- Footer Seal -->
         <div class="mt-8 pt-6 border-t border-warm-200 text-center text-[10px] text-stone-500">
-            Terima kasih telah memilih Lumina Grand Hotel &amp; Resor. Voucher ini sah dan diterbitkan secara elektronik oleh Sistem PMS HotelOps.
+            Terima kasih telah memilih ZSL Residence Hotel &amp; Resor. Voucher ini sah dan diterbitkan secara elektronik oleh Sistem PMS HotelOps.
         </div>
     </div>
 </div>

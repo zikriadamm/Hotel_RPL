@@ -20,7 +20,10 @@
         <!-- Invoice Header -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b-2 border-[#0A1526] pb-6 mb-6">
             <div>
-                <h1 class="text-3xl font-bold tracking-tight text-[#0A1526]">LUMINA GRAND HOTEL</h1>
+                <div class="flex items-center space-x-3 mb-1">
+                    <img src="{{ asset('brand/zsl-residence/source/zsl-symbol-master-color.svg') }}" alt="Logo ZSL Residence" class="w-9 h-9 object-contain">
+                    <h1 class="text-3xl font-bold tracking-tight text-[#0A1526]">ZSL RESIDENCE HOTEL</h1>
+                </div>
                 <p class="text-xs text-[#5A6578] font-semibold mt-0.5">Sistem Manajemen Operasional & Meja Resepsionis</p>
                 <p class="text-[11px] text-[#5A6578]">Jl. Pariwisata Raya No. 45, Indonesia | Telp: (021) 7654321</p>
             </div>
@@ -128,7 +131,7 @@
         </div>
 
         <div class="mt-8 text-center text-[10px] text-[#5A6578]">
-            Terima kasih telah menginap di Lumina Grand Hotel. Kuitansi ini sah sebagai bukti pembayaran resmi.
+            Terima kasih telah menginap di ZSL Residence Hotel. Kuitansi ini sah sebagai bukti pembayaran resmi.
         </div>
     </div>
 </div>

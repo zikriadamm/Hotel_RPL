@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Katalog Kamar Akomodasi — Lumina Grand')
+@section('title', 'Katalog Kamar Akomodasi — ZSL Residence')
 
 @section('content')
 <div class="max-w-7xl mx-auto space-y-8" 
@@ -394,7 +394,7 @@
                             <svg class="w-5 h-5 text-gold-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             <span>Daftar Fasilitas Lengkap Kamar</span>
                         </h3>
-                        <span class="text-[11px] font-semibold text-stone-500">Standar Bintang 5 Lumina Grand</span>
+                        <span class="text-[11px] font-semibold text-stone-500">Standar Bintang 5 ZSL Residence</span>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

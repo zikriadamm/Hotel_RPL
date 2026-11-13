@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Portal Pelanggan & Riwayat Reservasi — Lumina Grand')
+@section('title', 'Portal Pelanggan & Riwayat Reservasi — ZSL Residence')
 
 @section('content')
 <div class="max-w-6xl mx-auto space-y-8">
@@ -95,7 +95,7 @@
                     <span class="w-2.5 h-2.5 rounded-full bg-gold-500"></span>
                     <h2 class="text-xl font-bold text-navy-900">Riwayat Reservasi Saya</h2>
                 </div>
-                <p class="text-xs text-stone-500 mt-0.5">Daftar lengkap pemesanan kamar yang pernah Anda lakukan di Lumina Grand Hotel &amp; Resor.</p>
+                <p class="text-xs text-stone-500 mt-0.5">Daftar lengkap pemesanan kamar yang pernah Anda lakukan di ZSL Residence Hotel &amp; Resor.</p>
             </div>
             <a href="{{ route('pelanggan.kamar') }}" class="inline-flex items-center space-x-2 bg-navy-900 hover:bg-black text-white text-xs font-bold px-5 py-2.5 rounded-full transition shadow-xs cursor-pointer self-start sm:self-auto">
                 <svg class="w-4 h-4 text-gold-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>

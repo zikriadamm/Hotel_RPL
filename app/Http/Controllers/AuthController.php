@@ -58,7 +58,7 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return $this->redirectBasedOnRole($user)->with('success', 'Pendaftaran akun berhasil! Selamat datang di Lumina Grand Hotel, ' . $user->nama . '.');
+        return $this->redirectBasedOnRole($user)->with('success', 'Pendaftaran akun berhasil! Selamat datang di ZSL Residence Hotel, ' . $user->nama . '.');
     }
 
     public function login(Request $request)

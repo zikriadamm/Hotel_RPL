@@ -51,9 +51,12 @@
         <!-- Letterhead Header -->
         <div class="border-b-2 border-[#0A1526] pb-4 mb-6">
             <div class="flex justify-between items-start">
-                <div>
-                    <h2 class="text-2xl font-bold text-[#0A1526] tracking-tight">LUMINA GRAND HOTEL</h2>
-                    <p class="text-xs text-[#5A6578] font-bold">LAPORAN TINGKAT OKUPANSI KAMAR HARIAN</p>
+                <div class="flex items-center space-x-3">
+                    <img src="{{ asset('brand/zsl-residence/source/zsl-symbol-master-color.svg') }}" alt="Logo ZSL Residence" class="w-9 h-9 object-contain">
+                    <div>
+                        <h2 class="text-2xl font-bold text-[#0A1526] tracking-tight">ZSL RESIDENCE HOTEL</h2>
+                        <p class="text-xs text-[#5A6578] font-bold">LAPORAN TINGKAT OKUPANSI KAMAR HARIAN</p>
+                    </div>
                 </div>
                 <div class="text-right text-xs">
                     <div class="text-[#5A6578] font-semibold">Tanggal Analisis:</div>

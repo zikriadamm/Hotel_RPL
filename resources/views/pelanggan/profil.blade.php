@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Profil Saya & Pengaturan Akun — Lumina Grand')
+@section('title', 'Profil Saya & Pengaturan Akun — ZSL Residence')
 
 @section('content')
 <div class="max-w-6xl mx-auto space-y-8" x-data="{ activeTab: 'identitas', deleteModalOpen: false }">
@@ -369,7 +369,7 @@
         <div class="p-6 sm:p-8 space-y-6">
             <div class="space-y-3 text-xs sm:text-sm text-stone-600 leading-relaxed">
                 <p>
-                    Apabila Anda menghapus akun Lumina Grand Anda:
+                    Apabila Anda menghapus akun ZSL Residence Anda:
                 </p>
                 <ul class="list-disc pl-5 space-y-1.5 text-xs text-stone-600">
                     <li>Seluruh data identitas pribadi, riwayat booking yang telah selesai, serta voucher reservasi akan dihapus permanen.</li>

@@ -47,11 +47,11 @@ class ProfileController extends Controller
             ->sum('total_harga');
 
         // Tingkat Keanggotaan Tamu (Guest Membership Tier)
-        $memberTier = 'Lumina Classic';
+        $memberTier = 'ZSL Classic';
         if ($selesaiPemesanan >= 5 || $totalPengeluaran >= 5000000) {
-            $memberTier = 'Lumina Elite Royal';
+            $memberTier = 'ZSL Elite Royal';
         } elseif ($selesaiPemesanan >= 2 || $totalPengeluaran >= 2000000) {
-            $memberTier = 'Lumina Prestige Gold';
+            $memberTier = 'ZSL Prestige Gold';
         }
 
         $stats = [

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 742 256" width="742" height="256" role="img" aria-labelledby="title">
+  <title id="title">ZSL Residence horizontal logo on dark</title>
+  <g id="symbol">
+    <path fill="#C69B56" d="M 38 114 A 90 90 0 0 1 218 114 H 198 A 70 70 0 0 0 58 114 Z"/>
+    <path fill="#FCFAF7" d="M 38 124 H 90 V 137 L 62.3 185 H 90 V 198 H 38 V 185 L 65.7 137 H 38 Z"/>
+    <path fill="#FCFAF7" d="M 154 146 H 137 C 136 139 133 136 128 136 C 122 136 119 140 119 145 C 119 151 124 154 134 158 C 150 164 156 172 156 183 C 156 194 146 200 128 200 C 110 200 100 193 99 179 H 116 C 117 185 121 188 128 188 C 135 188 138 185 138 180 C 138 174 134 171 123 167 C 107 161 101 154 101 143 C 101 130 111 122 128 122 C 144 122 152 131 154 146 Z"/>
+    <path fill="#FCFAF7" d="M 170 124 H 189 V 184 H 218 V 198 H 170 Z"/>
+    <rect fill="#FCFAF7" x="38" y="210" width="72" height="20"/>
+    <rect fill="#FCFAF7" x="146" y="210" width="72" height="20"/>
+  </g>
+  <rect fill="#C69B56" x="252" y="76" width="6" height="106"/>
+  <g id="wordmark">
+    <path fill="#FCFAF7" fill-rule="evenodd" transform="translate(282.0 102.0) scale(0.540)" d="M 4 0 H 38 C 56 0 66 11 66 28 C 66 42 58 51 45 55 L 67 100 H 51 L 31 57 H 18 V 100 H 4 Z M 18 13 V 44 H 37 C 46 44 52 38 52 28 C 52 18 46 13 37 13 Z"/>
+    <path fill="#FCFAF7" fill-rule="evenodd" transform="translate(334.7 102.0) scale(0.540)" d="M 4 0 H 58 V 13 H 18 V 43 H 52 V 56 H 18 V 87 H 58 V 100 H 4 Z"/>
+    <path fill="#FCFAF7" fill-rule="evenodd" transform="translate(383.1 102.0) scale(0.540)" d="M 62 24 H 48 C 46 15 41 12 33 12 C 23 12 18 17 18 25 C 18 33 23 37 36 42 C 55 49 64 56 64 72 C 64 90 52 102 33 102 C 14 102 3 91 2 73 H 16 C 17 83 23 89 33 89 C 44 89 50 83 50 74 C 50 65 44 60 31 55 C 13 48 4 41 4 26 C 4 9 16 -2 33 -2 C 50 -2 60 8 62 24 Z"/>
+    <path fill="#FCFAF7" fill-rule="evenodd" transform="translate(434.8 102.0) scale(0.540)" d="M 4 0 H 18 V 100 H 4 Z"/>
+    <path fill="#FCFAF7" fill-rule="evenodd" transform="translate(462.6 102.0) scale(0.540)" d="M 4 0 H 34 C 55 0 68 17 68 50 C 68 83 55 100 34 100 H 4 Z M 18 13 V 87 H 34 C 47 87 54 74 54 50 C 54 26 47 13 34 13 Z"/>
+    <path fill="#FCFAF7" fill-rule="evenodd" transform="translate(516.4 102.0) scale(0.540)" d="M 4 0 H 58 V 13 H 18 V 43 H 52 V 56 H 18 V 87 H 58 V 100 H 4 Z"/>
+    <path fill="#FCFAF7" fill-rule="evenodd" transform="translate(564.8 102.0) scale(0.540)" d="M 4 0 H 19 L 52 74 V 0 H 66 V 100 H 51 L 18 26 V 100 H 4 Z"/>
+    <path fill="#FCFAF7" fill-rule="evenodd" transform="translate(618.6 102.0) scale(0.540)" d="M 65 28 H 50 C 48 18 42 12 34 12 C 22 12 16 25 16 50 C 16 75 22 88 34 88 C 42 88 48 82 50 72 H 65 C 62 91 51 102 34 102 C 13 102 2 84 2 50 C 2 16 13 -2 34 -2 C 51 -2 62 9 65 28 Z"/>
+    <path fill="#FCFAF7" fill-rule="evenodd" transform="translate(671.4 102.0) scale(0.540)" d="M 4 0 H 58 V 13 H 18 V 43 H 52 V 56 H 18 V 87 H 58 V 100 H 4 Z"/>
+  </g>
+</svg>

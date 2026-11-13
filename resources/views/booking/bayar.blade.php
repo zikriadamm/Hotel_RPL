@@ -126,7 +126,7 @@
 
             <!-- Identitas Merchant -->
             <div class="mt-4 mb-3">
-                <h2 class="text-lg font-black text-navy-900 tracking-tight">LUMINA GRAND HOTEL &amp; RESOR</h2>
+                <h2 class="text-lg font-black text-navy-900 tracking-tight">ZSL RESIDENCE HOTEL &amp; RESOR</h2>
                 <div class="text-[11px] text-stone-500 font-mono mt-0.5">
                     NMID: <strong class="text-stone-700">ID102026889901</strong> &bull; Acuan: {{ $pemesanan->kode_booking }}
                 </div>

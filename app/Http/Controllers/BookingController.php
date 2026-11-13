@@ -215,6 +215,7 @@ class BookingController extends Controller
     {
         $amount = number_format($pemesanan->total_harga, 0, '', '');
         $bookingCode = $pemesanan->kode_booking;
+        $merchantName = "ZSL RESIDENCE HOTEL";
 
         $payload = "000201"
             . "010212"
@@ -224,7 +225,7 @@ class BookingController extends Controller
             . "5303360"
             . "54" . sprintf("%02d", strlen($amount)) . $amount
             . "5802ID"
-            . "5926LUMINA GRAND HOTEL & RESOR"
+            . "59" . sprintf("%02d", strlen($merchantName)) . $merchantName
             . "6007JAKARTA"
             . "610510110"
             . "62" . sprintf("%02d", strlen("01" . sprintf("%02d", strlen($bookingCode)) . $bookingCode))
@@ -624,7 +625,7 @@ class BookingController extends Controller
                 'total_unit' => $suiteTotal,
             ],
             'suite-residence' => [
-                'nama' => 'The Lumina Grand Residence',
+                'nama' => 'The ZSL Residence',
                 'tipe' => 'Suite',
                 'kategori' => 'Presidential Penthouse',
                 'tagline' => 'Tiga kamar tidur & kolam renang infinity 15m.',

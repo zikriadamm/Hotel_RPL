@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Daftar Akun Baru — Lumina Grand')
+@section('title', 'Daftar Akun Baru — ZSL Residence')
 
 @section('content')
 <div class="max-w-md mx-auto my-6">
@@ -8,12 +8,10 @@
         
         <!-- Header -->
         <div class="text-center mb-8">
-            <div class="w-14 h-14 rounded-2xl bg-navy-900 border border-gold-500/30 text-gold-300 flex items-center justify-center mx-auto mb-3 shadow-md">
-                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-                </svg>
+            <div class="w-14 h-14 rounded-2xl bg-navy-900 border border-gold-500/30 flex items-center justify-center mx-auto mb-3 p-2 shadow-md">
+                <img src="{{ asset('brand/zsl-residence/source/zsl-symbol-on-dark.svg') }}" alt="Logo ZSL Residence" class="w-full h-full object-contain">
             </div>
-            <h1 class="text-2xl font-bold text-navy-900 tracking-tight">Lumina Grand</h1>
+            <h1 class="text-2xl font-bold text-navy-900 tracking-tight">ZSL Residence</h1>
             <p class="text-xs text-gold-600 mt-1 font-semibold tracking-wider uppercase">Pendaftaran Akun Tamu</p>
             <p class="text-xs text-navy-700/70 mt-1">Daftarkan akun untuk kemudahan reservasi dan kenyamanan menginap.</p>
         </div>

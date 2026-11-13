@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lumina Grand Hotel &amp; Resor — Kemewahan Modern yang Hangat</title>
+  <title>ZSL Residence Hotel &amp; Resor — Kemewahan Modern yang Hangat</title>
+  <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="48x48">
+  <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+  <link rel="manifest" href="{{ asset('site.webmanifest') }}">
+  <meta name="theme-color" content="#0F1D38">
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -66,9 +71,8 @@
        Bilah Navigasi Atas (Sticky Nav)
        ======================================================================== -->
   <header class="lumina-nav">
-    <a href="{{ route('landing') }}" class="nav-brand">
-      <span class="brand-title">LUMINA GRAND</span>
-      <span class="brand-subtitle">Hotel &amp; Resor</span>
+    <a href="{{ route('landing') }}" class="nav-brand" aria-label="ZSL Residence — Beranda" style="flex-direction: row; align-items: center;">
+      <img src="{{ asset('brand/zsl-residence/lockups/zsl-logo-horizontal-color.svg') }}" alt="ZSL Residence" style="height: 54px; width: auto; display: block;">
     </a>
 
     <nav class="nav-links">
@@ -516,16 +520,16 @@
   <footer id="footer" class="lumina-footer" data-sc-in>
     <div class="footer-inner">
       <div class="footer-brand">
-        <span class="brand-title" style="font-size: 1.4rem; font-weight: 800; letter-spacing: 0.08em;">LUMINA GRAND</span>
-        <p style="color: #616C7D; font-size: 0.8rem; margin-top: 4px;">Standar Kemewahan Modern yang Hangat</p>
+        <img src="{{ asset('brand/zsl-residence/lockups/zsl-logo-horizontal-on-dark.svg') }}" alt="ZSL Residence" style="height: 56px; width: auto; display: block;">
+        <p style="color: #8C97A8; font-size: 0.8rem; margin-top: 8px;">Standar Kemewahan Modern yang Hangat</p>
       </div>
       <div style="display: flex; gap: 2rem; font-size: 0.82rem;">
         <span style="color: var(--gold-400);">Layanan Tamu (Concierge): +62 812 3456 7890</span>
-        <span>layanan@luminagrand.com</span>
+        <span>layanan@zslresidence.com</span>
       </div>
     </div>
     <div class="footer-copyright">
-      <p>&copy; {{ date('Y') }} Lumina Grand Hotel &amp; Resor. Sistem Manajemen Operasional Hotel.</p>
+      <p>&copy; {{ date('Y') }} ZSL Residence Hotel &amp; Resor. Sistem Manajemen Operasional Hotel.</p>
       <p style="color: #4C566A;">Ditenagai oleh Mesin Interaksi Scroll-Craft &bull; Laravel 10</p>
     </div>
   </footer>
@@ -557,7 +561,7 @@
         Masuk atau Daftar Terlebih Dahulu
       </h2>
       <p class="lumina-modal-subtitle" style="max-width: 400px; margin: 0 auto 22px; font-size: 0.82rem; line-height: 1.55;">
-        Untuk memesan kamar pilihan Anda di <strong>Lumina Grand Hotel &amp; Resor</strong>, silakan masuk ke akun Anda atau mendaftarkan akun tamu baru terlebih dahulu.
+        Untuk memesan kamar pilihan Anda di <strong>ZSL Residence Hotel &amp; Resor</strong>, silakan masuk ke akun Anda atau mendaftarkan akun tamu baru terlebih dahulu.
       </p>
 
       <!-- 2 Tombol Aksi: Masuk & Daftar -->
@@ -617,6 +621,45 @@
       var scrollCue = document.getElementById('scroll-cue');
       var planeFar = document.getElementById('hero-plane-far');
       var planeMid = document.getElementById('hero-plane-mid');
+      var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-links a[href^="#"]'));
+      var navSections = navLinks.map(function(link) {
+        var target = document.querySelector(link.getAttribute('href'));
+        return target ? { id: target.id, el: target, link: link } : null;
+      }).filter(Boolean);
+
+      function setActiveNav(id) {
+        navLinks.forEach(function(link) {
+          var isMatch = link.getAttribute('href') === '#' + id;
+          link.classList.toggle('active', isMatch);
+        });
+      }
+
+      navLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          var href = link.getAttribute('href');
+          if (href && href.length > 1) {
+            setActiveNav(href.slice(1));
+          }
+        });
+      });
+
+      function updateActiveSection(scrollY) {
+        if (!navSections.length) return;
+        var activeId = navSections[0].id;
+        var triggerLine = 180;
+
+        for (var i = 0; i < navSections.length; i++) {
+          if (navSections[i].el.getBoundingClientRect().top <= triggerLine) {
+            activeId = navSections[i].id;
+          }
+        }
+
+        if ((window.innerHeight + scrollY) >= document.documentElement.scrollHeight - 40) {
+          activeId = navSections[navSections.length - 1].id;
+        }
+
+        setActiveNav(activeId);
+      }
 
       function onScroll() {
         var scrollY = window.pageYOffset || document.documentElement.scrollTop;
@@ -644,6 +687,9 @@
         if (planeMid && scrollY < window.innerHeight * 1.5) {
           planeMid.style.transform = 'translate3d(0, ' + (scrollY * 0.14) + 'px, 0)';
         }
+
+        // 5. Perbarui Indikator Aktif Navigasi Atas
+        updateActiveSection(scrollY);
       }
 
       window.addEventListener('scroll', onScroll, { passive: true });
