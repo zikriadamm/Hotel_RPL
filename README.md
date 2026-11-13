@@ -89,10 +89,48 @@ php vendor/bin/phpunit
 ```
 
 **Hasil Pengujian:**
-- 11 Tests, 25 Assertions: **100% Pass** (Mencakup pengujian keunikan nomor kamar, validasi tarif > 0, proteksi RBAC, transaksi kasir, dan alur siklus hidup operasional kamar).
+- 32 Tests (Unit & Feature, termasuk validasi nomor kamar, tarif > 0, proteksi RBAC, kasir check-out, webhook QRIS, dan kesiapan kamar saat check-in).
+
+---
+
+## ⚙️ Continuous Integration (GitHub Actions)
+
+Repositori ini menggunakan **GitHub Actions** untuk memeriksa kualitas kode dan menjalankan pengujian otomatis pada setiap `push` dan `pull_request`.
+
+- **Berkas Workflow:** [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
+- **Lingkungan Runner:** `ubuntu-latest` dengan **PHP 8.1** (`pdo_sqlite`, `sqlite3`, `mbstring`, `xml`, `ctype`, `iconv`, `intl`) dan database pengujian **SQLite `:memory:`** (sesuai `phpunit.xml`).
+- **Tahapan Pipeline:**
+  1. `actions/checkout@v4` — Mengambil kode terbaru dari repositori.
+  2. `shivammathur/setup-php@v2` — Menyiapkan runtime PHP 8.1 beserta ekstensi yang dibutuhkan.
+  3. `cp .env.example .env` — Menyiapkan berkas environment uji.
+  4. `composer install --no-interaction --prefer-dist --optimize-autoloader` — Menginstal seluruh dependensi Composer.
+  5. `php artisan key:generate` — Membuat `APP_KEY` untuk lingkungan CI.
+  6. `find app routes tests -name "*.php" -print0 | xargs -0 -n1 php -l` — Memeriksa sintaks PHP (*lint*).
+  7. `php artisan test` — Menjalankan seluruh unit & feature test PHPUnit.
+
+### Menjalankan Langkah CI Secara Lokal
+
+**Linux / macOS / Git Bash:**
+```bash
+cp -n .env.example .env
+composer install --no-interaction --prefer-dist
+php artisan key:generate
+find app routes tests -name "*.php" -print0 | xargs -0 -n1 php -l
+php artisan test
+```
+
+**Windows (PowerShell + PHP Laragon):**
+```powershell
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+composer install --no-interaction --prefer-dist
+php artisan key:generate
+Get-ChildItem -Recurse app, routes, tests -Filter *.php | ForEach-Object { php -l $_.FullName }
+php artisan test
+```
 
 ---
 
 ## 📄 Dokumen Terkait
+- [docs/LAPORAN_CI.md](docs/LAPORAN_CI.md): Laporan Tugas Pipeline CI (Bukti Run, Ringkasan Error & Perbaikan, Pembagian Peran Tim).
 - [design.md](design.md): Panduan Desain Sistem & Token UI/UX Bento.
 - [PLAN_SISTEM_HOTEL_OPERASIONAL.md](PLAN_SISTEM_HOTEL_OPERASIONAL.md): Perencanaan dan spesifikasi kebutuhan fungsional sistem.
