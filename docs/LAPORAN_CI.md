@@ -11,22 +11,23 @@
 - **Repository GitHub:** https://github.com/zikriadamm/Hotel_RPL
 - **Berkas Workflow CI:** [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)
 - **Trigger Otomatis:** `push` dan `pull_request`
-- **Pull Request Pipeline:** `<TEMPEL_URL_PULL_REQUEST_DI_SINI>`
+- **Pull Request Pipeline:** https://github.com/zikriadamm/Hotel_RPL/pull/1
 
 ---
 
 ## 2. Bukti Eksekusi Pipeline (GitHub Actions)
 
 ### A. Run Gagal (Before Fix — *Test Fail*)
-- **Commit / Tahap:** Commit 1 pada branch `ci/setup-pipeline` (`test: add regression test for check-in room readiness`)
-- **URL Run Gagal:** `<TEMPEL_URL_GITHUB_ACTIONS_RUN_GAGAL_DI_SINI>`
+- **Commit / Tahap:** Commit 1 (`09380a2`) pada branch `ci/setup-pipeline` (`ci: add GitHub Actions workflow, CI docs, and check-in regression test`)
+- **URL Run Gagal (`push`):** https://github.com/zikriadamm/Hotel_RPL/actions/runs/43720701810
+- **URL Run Gagal (`pull_request`):** https://github.com/zikriadamm/Hotel_RPL/actions/runs/43722719226
 - **Status:** `Failed` (Merah) — `1 failed, 31 passed (116 assertions)`
 - **Screenshot Bukti Run Gagal:**
   > `<TEMPEL_ATAU_SEMATKAN_SCREENSHOT_RUN_GAGAL_DI_SINI>`
 
 ### B. Run Sukses (After Fix — *Passed*)
-- **Commit / Tahap:** Commit 2 pada branch `ci/setup-pipeline` (`fix: reject check-in when room is occupied or dirty`)
-- **URL Run Sukses:** `<TEMPEL_URL_GITHUB_ACTIONS_RUN_SUKSES_DI_SINI>`
+- **Commit / Tahap:** Commit 2 (`fb9ad3c`) pada branch `ci/setup-pipeline` (`fix: reject check-in when room is occupied or dirty`)
+- **URL Run Sukses:** `<MENUNGGU_URL_RUN_SUKSES>`
 - **Status:** `Success` (Hijau) — `32 passed (117 assertions)`
 - **Screenshot Bukti Run Sukses:**
   > `<TEMPEL_ATAU_SEMATKAN_SCREENSHOT_RUN_SUKSES_DI_SINI>`
