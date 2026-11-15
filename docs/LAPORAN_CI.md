@@ -23,15 +23,29 @@
 - **URL Run Gagal (`pull_request`):** https://github.com/zikriadamm/Hotel_RPL/actions/runs/43722719226
 - **Status:** `Failed` (Merah) — `1 failed, 31 passed (116 assertions)`
 - **Screenshot Bukti Run Gagal:**
-  > `<TEMPEL_ATAU_SEMATKAN_SCREENSHOT_RUN_GAGAL_DI_SINI>`
+
+  **Ringkasan Run Gagal (`push`):**
+  ![Ringkasan Run Gagal GitHub Actions](screenshots/01-ci-failed-summary.png)
+
+  **Log Error pada Step `Run automated tests`:**
+  ![Log Error Test Fail](screenshots/02-ci-failed-test-log.png)
+
+  **Status Checks Gagal pada Pull Request #1 (`push` & `pull_request`):**
+  ![PR Checks Gagal](screenshots/03-pr-checks-failed.png)
 
 ### B. Run Sukses (After Fix — *Passed*)
 - **Commit / Tahap:** Perbaikan check-in (`fb9ad3c` / `cd23ba9`) pada branch `ci/setup-pipeline` (`fix: reject check-in when room is occupied or dirty`)
 - **URL Run Sukses (`push`):** https://github.com/zikriadamm/Hotel_RPL/actions/runs/43723142934
 - **URL Run Sukses (`pull_request`):** https://github.com/zikriadamm/Hotel_RPL/actions/runs/43723148710
+- **URL Run Terbaru (`main`):** https://github.com/zikriadamm/Hotel_RPL/actions/runs/43724492927
 - **Status:** `Success` (Hijau) — `32 passed (117 assertions)`
 - **Screenshot Bukti Run Sukses:**
-  > `<TEMPEL_ATAU_SEMATKAN_SCREENSHOT_RUN_SUKSES_DI_SINI>`
+
+  **Status Commit Hijau (2/2 Checks Passed):**
+  ![Commit Sukses Setelah Perbaikan](screenshots/04-ci-passed-commits.png)
+
+  **Pull Request #1 Lolos Seluruh Checks & Merged ke `main`:**
+  ![PR #1 Merged dan Passed](screenshots/05-pr-merged-passed.png)
 
 ---
 
