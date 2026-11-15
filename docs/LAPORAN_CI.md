@@ -74,11 +74,9 @@ Lihat bagian **Continuous Integration (GitHub Actions)** pada [`README.md`](../R
 
 ## 5. Pembagian Peran Tim & Penjelasan
 
-> **Petunjuk:** Silakan ganti `[Nama Anggota / NIM]` dengan data anggota kelompok Anda sebelum dikumpulkan.
-
 | No | Nama & NIM | Peran dalam Tugas CI | Tanggung Jawab & Kontribusi |
 | :-: | :--- | :--- | :--- |
-| 1 | `[Nama Anggota 1 / NIM]` | **DevOps & Workflow Engineer** | Menyiapkan berkas `.github/workflows/ci.yml`, mengonfigurasi trigger `push` & `pull_request`, setup PHP 8.1 + ekstensi `pdo_sqlite`, serta memastikan langkah `composer install`, `php -l`, dan `php artisan test` berjalan otomatis. |
-| 2 | `[Nama Anggota 2 / NIM]` | **QA & Regression Tester** | Memverifikasi perintah build/test berjalan di lingkungan lokal, merancang dan menulis *regression test* (`test_check_in_ditolak_jika_kamar_masih_terisi_atau_kotor`) yang mereproduksi celah validasi check-in sehingga memicu run gagal (*Test Fail*) di CI. |
-| 3 | `[Nama Anggota 3 / NIM]` | **Backend Fix Engineer** | Menganalisis log kegagalan pipeline pada `HotelOperationsTest`, menelusuri akar masalah di `FrontDeskController::checkIn()`, mengimplementasikan validasi status & kebersihan kamar, lalu memverifikasi seluruh 32 test lulus. |
-| 4 | `[Nama Anggota 4 / NIM]` | **Documentation & Evidence Lead** | Memperbarui panduan menjalankan CI di `README.md`, menyusun ringkasan error dan langkah perbaikan di `docs/LAPORAN_CI.md`, serta mengumpulkan tautan PR dan screenshot run gagal maupun run sukses. |
+| 1 | Lidiya (`F5512530118`) | **DevOps & Workflow Engineer** | Menyiapkan berkas `.github/workflows/ci.yml`, mengonfigurasi trigger `push` & `pull_request`, setup PHP 8.1 + ekstensi `pdo_sqlite`, serta memastikan langkah `composer install`, `php -l`, dan `php artisan test` berjalan otomatis. |
+| 2 | Tabita Creaselia Belicia Theona (`F5512520086`) | **QA & Regression Tester** | Memverifikasi perintah build/test berjalan di lingkungan lokal, merancang dan menulis *regression test* (`test_check_in_ditolak_jika_kamar_masih_terisi_atau_kotor`) yang mereproduksi celah validasi check-in sehingga memicu run gagal (*Test Fail*) di CI. |
+| 3 | Muhammad Zikri Adam (`F5512530117`) | **Backend Fix Engineer** | Menganalisis log kegagalan pipeline pada `HotelOperationsTest`, menelusuri akar masalah di `FrontDeskController::checkIn()`, mengimplementasikan validasi status & kebersihan kamar, lalu memverifikasi seluruh 32 test lulus. |
+| 4 | Trista Sheryl Lambei (`F5512530106`) | **Documentation & Evidence Lead** | Memperbarui panduan menjalankan CI di `README.md`, menyusun ringkasan error dan langkah perbaikan di `docs/LAPORAN_CI.md`, serta mengumpulkan tautan PR dan screenshot run gagal maupun run sukses. |
