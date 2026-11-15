@@ -626,4 +626,30 @@ class HotelOperationsTest extends TestCase
         $this->assertDatabaseMissing('users', ['id' => $tempTamu->id]);
         $this->assertGuest();
     }
+
+    /** Test 30: Check-in ditolak jika kamar masih berstatus Terisi atau Kotor */
+    public function test_check_in_ditolak_jika_kamar_masih_terisi_atau_kotor(): void
+    {
+        $this->kamar->update([
+            'status' => 'Terisi',
+            'status_kebersihan' => 'Kotor',
+        ]);
+
+        $pemesanan = Pemesanan::create([
+            'kode_booking' => 'BKG-TEST-BLOCK-01',
+            'tamu_id' => $this->tamu->id,
+            'kamar_id' => $this->kamar->id,
+            'tanggal_check_in' => today(),
+            'tanggal_check_out' => today()->addDays(2),
+            'total_harga' => 600000,
+            'status' => 'Dipesan',
+            'pembuat_id' => $this->resepsionis->id,
+        ]);
+
+        $response = $this->actingAs($this->resepsionis)->post(route('resepsionis.pemesanan.checkin', $pemesanan->id));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('error');
+        $this->assertEquals('Dipesan', $pemesanan->fresh()->status);
+    }
 }

@@ -143,6 +143,11 @@ class FrontDeskController extends Controller
             return back()->with('error', 'Hanya pemesanan dengan status "Dipesan" yang dapat di-check-in.');
         }
 
+        $kamar = $pemesanan->kamar;
+        if ($kamar->status !== 'Tersedia' || $kamar->status_kebersihan !== 'Bersih') {
+            return back()->with('error', "Kamar {$kamar->nomor_kamar} belum siap ditempati (Status: {$kamar->status}, Kebersihan: {$kamar->status_kebersihan}).");
+        }
+
         DB::transaction(function () use ($pemesanan) {
             $pemesanan->update(['status' => 'Check-in']);
             $pemesanan->kamar->update([
