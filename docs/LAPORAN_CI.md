@@ -26,8 +26,9 @@
   > `<TEMPEL_ATAU_SEMATKAN_SCREENSHOT_RUN_GAGAL_DI_SINI>`
 
 ### B. Run Sukses (After Fix — *Passed*)
-- **Commit / Tahap:** Commit 2 (`fb9ad3c`) pada branch `ci/setup-pipeline` (`fix: reject check-in when room is occupied or dirty`)
-- **URL Run Sukses:** `<MENUNGGU_URL_RUN_SUKSES>`
+- **Commit / Tahap:** Perbaikan check-in (`fb9ad3c` / `cd23ba9`) pada branch `ci/setup-pipeline` (`fix: reject check-in when room is occupied or dirty`)
+- **URL Run Sukses (`push`):** https://github.com/zikriadamm/Hotel_RPL/actions/runs/43723142934
+- **URL Run Sukses (`pull_request`):** https://github.com/zikriadamm/Hotel_RPL/actions/runs/43723148710
 - **Status:** `Success` (Hijau) — `32 passed (117 assertions)`
 - **Screenshot Bukti Run Sukses:**
   > `<TEMPEL_ATAU_SEMATKAN_SCREENSHOT_RUN_SUKSES_DI_SINI>`
