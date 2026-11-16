@@ -12,6 +12,7 @@
 - **Berkas Workflow CI:** [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)
 - **Trigger Otomatis:** `push` dan `pull_request`
 - **Pull Request Pipeline:** https://github.com/zikriadamm/Hotel_RPL/pull/1
+- - **Branch Kolaborasi Tim:** `ci/team-collaboration` (kontribusi commit seluruh anggota kelompok)
 
 ---
 
