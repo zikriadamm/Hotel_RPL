@@ -1,35 +1,42 @@
-# HotelOps — Sistem Informasi Manajemen Meja Depan Hotel
+# ZSL Residence (HotelOps) — Sistem Informasi Manajemen Hotel & Resor
 
 > **Tugas Besar Rekayasa Perangkat Lunak (RPL) - Semester 3**  
-> Sistem Manajemen Operasional Hotel (*Property Management System / Front Desk System*) berbasis **Laravel 10**, **Blade**, **Tailwind CSS**, dan **Alpine.js**.
+> Sistem Reservasi Tamu & Manajemen Operasional Hotel (*Property Management System / Front Desk System*) untuk **ZSL Residence Hotel & Resor** berbasis **Laravel 10**, **Blade**, **Tailwind CSS**, dan **Alpine.js**.
 
 ---
 
 ## 🌟 Fitur Utama
 
-1. **Denah Kamar Visual Interaktif (Bento Grid Layout):**
+1. **Portal Pelanggan & Reservasi Mandiri:**
+   - **Landing Page & Katalog Suite:** 9 pilihan unit/suite lengkap beserta fasilitas terperinci dan pengecekan ketersediaan tanggal.
+   - **Booking & Pembayaran QRIS Dinamis:** Perhitungan total tarif otomatis, payload EMVCo QRIS atas nama `ZSL RESIDENCE HOTEL`, webhook settlement (`/api/webhook/qris`), serta cetak voucher reservasi elektronik.
+   - **Portal Tamu:** Riwayat reservasi, pembatalan pesanan mandiri, membership tier (`ZSL Classic`, `ZSL Prestige Gold`, `ZSL Elite Royal`), serta CRUD profil dan kata sandi.
+
+2. **Denah Kamar Visual Interaktif:**
    - Monitoring status kamar real-time: *Tersedia*, *Terisi*, *Kotor*, dan *Perawatan*.
    - Panel inspektur interaktif di sisi kanan untuk melihat rincian tamu, kamar, dan tindakan cepat.
 
-2. **Otomatisasi Sinkronisasi Status Kamar:**
-   - **Check-In:** Mengubah status kamar menjadi **Terisi**.
+3. **Otomatisasi Sinkronisasi Status Kamar:**
+   - **Check-In:** Memvalidasi kesiapan kamar (`Tersedia` dan `Bersih`) sebelum mengubah status kamar menjadi **Terisi**.
    - **Check-Out & Kasir:** Menghitung total tagihan, nominal pembayaran tunai/transfer/QRIS, serta kembalian secara otomatis, lalu mengubah status kamar menjadi **Kotor**.
    - **Housekeeping:** Petugas kebersihan memverifikasi dan menandai kamar selesai dibersihkan, sehingga otomatis kembali menjadi **Tersedia & Bersih**.
 
-3. **Otorisasi Hak Akses Berbasis Peran (RBAC):**
+4. **Otorisasi Hak Akses Berbasis Peran (RBAC):**
+   - **Pelanggan / Tamu:** Katalog akomodasi, pemesanan mandiri, riwayat transaksi, dan pengelolaan akun.
    - **Resepsionis:** Registrasi buku tamu, pembuatan reservasi kamar, check-in tamu, kasir pembayaran & cetak kuitansi.
    - **Petugas Kebersihan (Housekeeping):** Papan tugas antrean kamar kotor dan verifikasi kamar bersih.
    - **Manajer Hotel:** Kontrol penuh master data kamar (CRUD), manajemen akun staf, serta akses ke seluruh laporan.
 
-4. **Tiga Format Laporan Manajerial & Cetak:**
+5. **Tiga Format Laporan Manajerial & Cetak:**
    - **Laporan Okupansi Harian:** Analisis tingkat keterisian unit hotel per hari.
    - **Laporan Pendapatan Bulanan:** Rekapitulasi transaksi penerimaan kas (Tunai, Bank, QRIS).
    - **Laporan Riwayat Tamu Menginap:** Catatan histori durasi dan kamar yang pernah disewa.
-   - **Kuitansi Resmi:** Tampilan siap cetak (*print-friendly*) untuk bukti pembayaran sah tamu.
+   - **Kuitansi & Kop Resmi ZSL Residence:** Tampilan siap cetak (*print-friendly*) lengkap dengan simbol *Gerbang Senja*.
 
-5. **Desain Sistem & Tipografi:**
-   - **Gaya:** *Warm Ivory Pastel Bento* terinspirasi estetika hotel butik modern.
-   - **Font Pairing:** **Fredoka** (Google Font rounded cartoon display untuk judul dan angka penting) dipadukan dengan **Montserrat** (geometric sans-serif untuk keterbacaan data).
+6. **Desain Sistem & Identitas Merek:**
+   - **Identitas Visual:** Paket logo **ZSL Residence ("Gerbang Senja")** pada `public/brand/zsl-residence/` lengkap dengan favicon dan web manifest.
+   - **Palet Warna:** *Midnight Navy* (`#0F1D38` / `#0A1526`), *Burnished Brass / Champagne Gold* (`#A37730` / `#C69B56`), dan *Warm Ivory* (`#FCFAF7`).
+   - **Font Pairing:** **Plus Jakarta Sans** untuk antarmuka & keterbacaan data, dipadukan dengan **Yellowtail** sebagai aksen skrip editorial.
 
 ---
 
@@ -74,22 +81,23 @@ Aplikasi dilengkapi tombol **1-Klik Demo Login** pada halaman login untuk memuda
 
 | Peran (Role) | Email | Kata Sandi | Akses Modul |
 | :--- | :--- | :--- | :--- |
-| **Manajer Hotel** | `manajer@hotel.com` | `password` | Master Kamar, Manajemen Staf, Seluruh Laporan |
-| **Resepsionis** | `resepsionis@hotel.com` | `password` | Denah Kamar, Reservasi, Buku Tamu, Kasir Check-out |
-| **Petugas Kebersihan** | `kebersihan@hotel.com` | `password` | Papan Tugas Housekeeping & Verifikasi Bersih |
+| **Manajer Hotel** | `manajer@hotel.com` | `password123` | Master Kamar, Manajemen Staf, Seluruh Laporan |
+| **Resepsionis** | `resepsionis@hotel.com` | `password123` | Denah Kamar, Reservasi, Buku Tamu, Kasir Check-out |
+| **Petugas Kebersihan** | `kebersihan@hotel.com` | `password123` | Papan Tugas Housekeeping & Verifikasi Bersih |
+| **Pelanggan / Tamu** | `ahmad.fauzi@example.com` | `password123` | Katalog Suite, Booking Mandiri, Riwayat, Profil |
 
 ---
 
 ## 🧪 Pengujian Otomatis (Automated Testing)
 
-Sistem telah diuji dengan pengujian fitur otomatis (Feature Tests) menggunakan PHPUnit:
+Sistem telah diuji dengan pengujian fitur otomatis (Unit & Feature Tests) menggunakan PHPUnit:
 
 ```bash
-php vendor/bin/phpunit
+php artisan test
 ```
 
 **Hasil Pengujian:**
-- 32 Tests (Unit & Feature, termasuk validasi nomor kamar, tarif > 0, proteksi RBAC, kasir check-out, webhook QRIS, dan kesiapan kamar saat check-in).
+- **33 Tests passed (120 assertions)** — mencakup validasi nomor kamar, tarif > 0, proteksi RBAC, portal pelanggan & booking mandiri, kasir check-out, webhook QRIS, serta penolakan check-in jika kamar masih terisi atau kotor.
 
 ---
 
@@ -132,5 +140,6 @@ php artisan test
 
 ## 📄 Dokumen Terkait
 - [docs/LAPORAN_CI.md](docs/LAPORAN_CI.md): Laporan Tugas Pipeline CI (Bukti Run, Ringkasan Error & Perbaikan, Pembagian Peran Tim).
-- [design.md](design.md): Panduan Desain Sistem & Token UI/UX Bento.
+- [docs/ci-cd-report.md](docs/ci-cd-report.md): Ringkasan Laporan Praktik Pipeline CI/CD.
+- [design.md](design.md): Panduan Desain Sistem & Token UI/UX.
 - [PLAN_SISTEM_HOTEL_OPERASIONAL.md](PLAN_SISTEM_HOTEL_OPERASIONAL.md): Perencanaan dan spesifikasi kebutuhan fungsional sistem.
