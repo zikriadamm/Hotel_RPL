@@ -652,8 +652,8 @@ class HotelOperationsTest extends TestCase
         $response->assertSessionHas('error');
         $this->assertEquals('Dipesan', $pemesanan->fresh()->status);
     }
-}
-/** Test 31: Check-in ditolak jika kamar masih berstatus Kotor walaupun Tersedia */
+
+    /** Test 31: Check-in ditolak jika kamar masih berstatus Kotor walaupun Tersedia */
     public function test_check_in_ditolak_jika_kamar_tersedia_tapi_kotor(): void
     {
         $this->kamar->update([
@@ -678,3 +678,4 @@ class HotelOperationsTest extends TestCase
         $response->assertSessionHas('error');
         $this->assertEquals('Dipesan', $pemesanan->fresh()->status);
     }
+}
