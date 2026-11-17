@@ -106,7 +106,6 @@
       @else
         <a href="{{ route('login', ['redirect' => 'booking']) }}" class="btn-link-subtle" style="font-weight: 700; color: var(--navy-900);">Masuk</a>
         <a href="{{ route('register', ['redirect' => 'booking']) }}" class="btn-link-subtle" style="font-weight: 700; color: var(--gold-600);">Daftar</a>
-        <button type="button" @click="mulaiBooking()" class="btn-pill-navy" style="cursor: pointer; border: none;">Pesan Kamar</button>
       @endauth
     </div>
   </header>
