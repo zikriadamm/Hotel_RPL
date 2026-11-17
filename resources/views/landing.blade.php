@@ -482,6 +482,7 @@
     </div>
   </section>
 
+  @if (config('app.demo_enabled'))
   <!-- ========================================================================
        Portal Pengujian (Simulasi Akses Multi-Peran)
        ======================================================================== -->
@@ -511,6 +512,7 @@
       </a>
     </div>
   </section>
+  @endif
 
   <!-- ========================================================================
        Kaki Halaman (Lumina Footer)
@@ -574,6 +576,7 @@
           <span>Daftar Akun Tamu Baru</span>
         </a>
 
+        @if (config('app.demo_enabled'))
         <div style="display: flex; align-items: center; gap: 8px; margin: 4px 0 2px;">
           <div style="flex: 1; height: 1px; background: var(--warm-200);"></div>
           <span style="font-size: 0.68rem; font-weight: 700; color: var(--gold-600); text-transform: uppercase;">Atau Pengujian Cepat</span>
@@ -584,6 +587,7 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
           <span>Simulasi Cepat Pelanggan (Ahmad Fauzi)</span>
         </a>
+        @endif
       </div>
 
       <!-- Feature Strip -->

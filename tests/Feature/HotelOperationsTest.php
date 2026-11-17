@@ -711,6 +711,11 @@ class HotelOperationsTest extends TestCase
     {
         config(['app.demo_enabled' => false]);
 
+        $this->get(route('landing'))
+            ->assertOk()
+            ->assertDontSee('Simulasi Cepat Pelanggan')
+            ->assertDontSee('Simulasi Akses Multi-Peran');
+
         $this->get(route('demo.login', 'Manajer'))->assertStatus(403);
 
         $pemesanan = Pemesanan::create([
