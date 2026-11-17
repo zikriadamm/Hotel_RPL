@@ -1,0 +1,16 @@
+/.git
+/node_modules
+/vendor
+/deliverables
+/docs
+/scratch
+/builds
+/.phpunit.cache
+/.fleet
+/.idea
+/.vscode
+/*.png
+/database/database.sqlite
+/.env
+/.env.*
+!/.env.example
