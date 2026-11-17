@@ -78,6 +78,7 @@
             </div>
         </form>
 
+        @if (config('app.demo_enabled'))
         <!-- Quick Demo Login Buttons -->
         <div class="mt-8 pt-6 border-t border-warm-200">
             <p class="text-[11px] font-bold text-gold-600 uppercase tracking-wider text-center mb-3">
@@ -117,6 +118,7 @@
                 </a>
             </div>
         </div>
+        @endif
 
     </div>
 </div>

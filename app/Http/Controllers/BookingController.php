@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class BookingController extends Controller
 {
@@ -24,13 +25,18 @@ class BookingController extends Controller
                 ->with('error', 'Silakan masuk ke akun Anda atau mendaftar terlebih dahulu untuk memesan kamar.');
         }
 
+        $noIdentitasRules = ['required', 'string', 'max:50'];
+        if (empty(Auth::user()->no_identitas)) {
+            $noIdentitasRules[] = Rule::unique('users', 'no_identitas')->ignore(Auth::id());
+        }
+
         $validated = $request->validate([
             'tipe_kamar' => 'required|in:Standar,Deluxe,Suite',
             'tanggal_check_in' => 'required|date|after_or_equal:today',
             'tanggal_check_out' => 'required|date|after:tanggal_check_in',
             'nama' => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            'no_identitas' => 'required|string|max:50',
+            'no_identitas' => $noIdentitasRules,
             'no_hp' => 'required|string|max:20',
             'metode_pembayaran' => 'required|in:Tunai,Transfer,QRIS',
         ], [
@@ -39,56 +45,55 @@ class BookingController extends Controller
             'nama.required' => 'Nama lengkap pemesan wajib diisi.',
             'email.required' => 'Alamat email wajib diisi.',
             'no_identitas.required' => 'Nomor NIK / Paspor wajib diisi.',
+            'no_identitas.unique' => 'Nomor NIK / Paspor ini sudah terdaftar pada akun lain.',
             'no_hp.required' => 'Nomor HP / WhatsApp wajib diisi.',
         ]);
 
-        // 1. Cari kamar fisik yang tersedia sesuai tipe dan tidak bentrok tanggal
-        $kamar = Kamar::where('tipe', $validated['tipe_kamar'])
-            ->where('status', 'Tersedia')
-            ->where('status_kebersihan', 'Bersih')
-            ->whereDoesntHave('pemesanans', function ($q) use ($validated) {
-                $q->whereIn('status', ['Dipesan', 'Check-in'])
-                    ->where('tanggal_check_in', '<', $validated['tanggal_check_out'])
-                    ->where('tanggal_check_out', '>', $validated['tanggal_check_in']);
-            })
-            ->first();
-
-        if (!$kamar) {
-            return back()->with('error', "Mohon maaf, semua unit Kamar {$validated['tipe_kamar']} sudah penuh untuk tanggal yang Anda pilih. Silakan pilih tipe kamar lain atau sesuaikan tanggal menginap.");
-        }
-
-        // 2. Hitung durasi dan total harga
         $checkIn = Carbon::parse($validated['tanggal_check_in']);
         $checkOut = Carbon::parse($validated['tanggal_check_out']);
         $durasiMalam = max(1, $checkIn->diffInDays($checkOut));
-        $totalHarga = $durasiMalam * $kamar->harga_per_malam;
 
-        // 3. Simpan data dalam database transaction
-        $pemesanan = DB::transaction(function () use ($validated, $kamar, $durasiMalam, $totalHarga) {
+        // Cari kamar bebas bentrok & simpan booking secara atomik dalam satu transaksi terkunci
+        $pemesanan = DB::transaction(function () use ($validated, $checkIn, $durasiMalam) {
+            $kamarQuery = Kamar::where('tipe', $validated['tipe_kamar'])
+                ->where('status', '!=', 'Perawatan')
+                ->whereDoesntHave('pemesanans', function ($q) use ($validated) {
+                    $q->whereIn('status', ['Dipesan', 'Check-in'])
+                        ->where('tanggal_check_in', '<', $validated['tanggal_check_out'])
+                        ->where('tanggal_check_out', '>', $validated['tanggal_check_in']);
+                });
+
+            if ($checkIn->isToday()) {
+                $kamarQuery->where('status', 'Tersedia')->where('status_kebersihan', 'Bersih');
+            }
+
+            $kamar = $kamarQuery->lockForUpdate()->first();
+            if (!$kamar) {
+                return null;
+            }
+
             $tamu = Auth::user();
-            
-            // Perbarui identitas profil jika belum lengkap
             $tamu->update([
                 'nama' => $validated['nama'] ?: $tamu->nama,
                 'no_hp' => $validated['no_hp'] ?: $tamu->no_hp,
                 'no_identitas' => $tamu->no_identitas ?: $validated['no_identitas'],
             ]);
 
-            $kodeBooking = Pemesanan::generateKodeBooking();
-
-            $booking = Pemesanan::create([
-                'kode_booking' => $kodeBooking,
+            return Pemesanan::create([
+                'kode_booking' => Pemesanan::generateKodeBooking(),
                 'tamu_id' => $tamu->id,
                 'kamar_id' => $kamar->id,
                 'tanggal_check_in' => $validated['tanggal_check_in'],
                 'tanggal_check_out' => $validated['tanggal_check_out'],
-                'total_harga' => $totalHarga,
+                'total_harga' => $durasiMalam * $kamar->harga_per_malam,
                 'status' => 'Dipesan',
                 'pembuat_id' => $tamu->id,
             ]);
-
-            return $booking;
         });
+
+        if (!$pemesanan) {
+            return back()->with('error', "Mohon maaf, semua unit Kamar {$validated['tipe_kamar']} sudah penuh untuk tanggal yang Anda pilih. Silakan pilih tipe kamar lain atau sesuaikan tanggal menginap.");
+        }
 
         // Jika metode pembayaran QRIS, langsung arahkan ke gerbang pembayaran QRIS dinamis
         if ($validated['metode_pembayaran'] === 'QRIS') {
@@ -151,6 +156,8 @@ class BookingController extends Controller
      */
     public function simulasiBayar(Request $request, Pemesanan $pemesanan)
     {
+        abort_unless(config('app.demo_enabled'), 403, 'Simulasi pembayaran hanya tersedia pada mode demo/pengembangan.');
+
         if (Auth::user()->peran === 'Tamu' && $pemesanan->tamu_id !== Auth::id()) {
             abort(403, 'Akses ditolak.');
         }
@@ -185,6 +192,14 @@ class BookingController extends Controller
      */
     public function webhookQris(Request $request)
     {
+        $secret = (string) config('services.qris.webhook_secret');
+        abort_if($secret === '', 503, 'QRIS webhook secret belum dikonfigurasi.');
+        abort_unless(
+            hash_equals($secret, (string) $request->header('X-Webhook-Secret', '')),
+            403,
+            'Signature webhook tidak valid.'
+        );
+
         $orderId = $request->input('order_id') ?? $request->input('external_id');
         $status = strtolower($request->input('transaction_status') ?? $request->input('status') ?? '');
 
@@ -274,62 +289,8 @@ class BookingController extends Controller
         $checkInDefault = $request->query('check_in', date('Y-m-d'));
         $checkOutDefault = $request->query('check_out', date('Y-m-d', strtotime('+1 day')));
 
-        $daftarKamar = [
-            'Standar' => [
-                'nama' => 'Suite Standar Heritage',
-                'tipe' => 'Standar',
-                'tarif' => 300000,
-                'luas' => '45 m²',
-                'kapasitas' => '2 Tamu Dewasa',
-                'ranjang' => '1 Tempat Tidur Queen',
-                'fasilitas' => [
-                    'Termasuk Sarapan Pagi Mewah',
-                    'Akses Wi-Fi Kecepatan Tinggi',
-                    'Smart TV 50 Inci & Saluran Kabel',
-                    'Kamar Mandi Marmer & Perlengkapan Mandi Premium',
-                    'Pendingin Udara AC Individual',
-                ],
-                'foto' => asset('storage/rooms/demo-suite-1.png'),
-                'fallback_foto' => 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=800&q=80',
-                'unit_tersedia' => Kamar::where('tipe', 'Standar')->where('status', 'Tersedia')->where('status_kebersihan', 'Bersih')->count(),
-            ],
-            'Deluxe' => [
-                'nama' => 'Villa Eksekutif Tepi Laut',
-                'tipe' => 'Deluxe',
-                'tarif' => 550000,
-                'luas' => '65 m²',
-                'kapasitas' => '2 Tamu Dewasa',
-                'ranjang' => '1 Tempat Tidur King',
-                'fasilitas' => [
-                    'Sajian Teh Sore Gratis Setiap Hari',
-                    'Balkon Privat Menghadap Senja',
-                    'Bathtub Teraso Terbuka & Rain Shower',
-                    'Minibar Pilihan Gratis Saat Kedatangan',
-                    'Mesin Pembuat Kopi Espresso Kapsul',
-                ],
-                'foto' => asset('storage/rooms/demo-suite-2.png'),
-                'fallback_foto' => 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80',
-                'unit_tersedia' => Kamar::where('tipe', 'Deluxe')->where('status', 'Tersedia')->where('status_kebersihan', 'Bersih')->count(),
-            ],
-            'Suite' => [
-                'nama' => 'Penthouse Presidensial',
-                'tipe' => 'Suite',
-                'tarif' => 950000,
-                'luas' => '120 m²',
-                'kapasitas' => '4 Tamu Dewasa',
-                'ranjang' => '1 Super King + 2 Twin Bed',
-                'fasilitas' => [
-                    'Layanan Butler Pribadi Berdedikasi 24 Jam',
-                    'Kolam Renang Rendam Privat di Rooftop',
-                    'Ruang Tamu Formal & Meja Makan Terpisah',
-                    'Jamuan Makan Malam Selamat Datang',
-                    'Fasilitas Check-in & Check-out di Dalam Kamar',
-                ],
-                'foto' => asset('storage/rooms/demo-suite-3.png'),
-                'fallback_foto' => 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80',
-                'unit_tersedia' => Kamar::where('tipe', 'Suite')->where('status', 'Tersedia')->where('status_kebersihan', 'Bersih')->count(),
-            ],
-        ];
+        $summary = $this->roomSummaryByType();
+        $daftarKamar = $this->baseRoomCatalog($summary);
 
         return view('booking.form', compact('user', 'tipeKamar', 'daftarKamar', 'checkInDefault', 'checkOutDefault'));
     }
@@ -340,15 +301,14 @@ class BookingController extends Controller
     public function kamarIndex(Request $request)
     {
         $user = Auth::user();
+        $summary = $this->roomSummaryByType();
 
-        $standarTersedia = Kamar::where('tipe', 'Standar')->where('status', 'Tersedia')->where('status_kebersihan', 'Bersih')->count();
-        $standarTotal = Kamar::where('tipe', 'Standar')->count();
-
-        $deluxeTersedia = Kamar::where('tipe', 'Deluxe')->where('status', 'Tersedia')->where('status_kebersihan', 'Bersih')->count();
-        $deluxeTotal = Kamar::where('tipe', 'Deluxe')->count();
-
-        $suiteTersedia = Kamar::where('tipe', 'Suite')->where('status', 'Tersedia')->where('status_kebersihan', 'Bersih')->count();
-        $suiteTotal = Kamar::where('tipe', 'Suite')->count();
+        $standarTersedia = $summary['Standar']['tersedia'];
+        $standarTotal = $summary['Standar']['total'];
+        $deluxeTersedia = $summary['Deluxe']['tersedia'];
+        $deluxeTotal = $summary['Deluxe']['total'];
+        $suiteTersedia = $summary['Suite']['tersedia'];
+        $suiteTotal = $summary['Suite']['total'];
 
         $standarFasilitasLengkap = [
             'Kenyamanan & Tidur' => [
@@ -438,7 +398,7 @@ class BookingController extends Controller
                 'kategori' => 'Heritage Suite',
                 'tagline' => 'Taman tropis asri & kolam refleksi.',
                 'deskripsi_lengkap' => 'Suasana tenang beraksen kayu jati dengan balkon privat menghadap taman tropis dan kolam refleksi.',
-                'tarif' => 300000,
+                'tarif' => $summary['Standar']['min_harga'],
                 'luas' => '45 m²',
                 'kapasitas' => '2 Tamu Dewasa',
                 'ranjang' => '1 Tempat Tidur Queen',
@@ -451,7 +411,7 @@ class BookingController extends Controller
                     'Balkon Privat Teduh Berkanopi',
                 ],
                 'fasilitas_lengkap' => $standarFasilitasLengkap,
-                'foto' => asset('storage/rooms/demo-suite-1.png'),
+                'foto' => asset('images/rooms/demo-suite-1.png'),
                 'fallback_foto' => 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=1200&q=80',
                 'unit_tersedia' => $standarTersedia,
                 'total_unit' => $standarTotal,
@@ -462,7 +422,7 @@ class BookingController extends Controller
                 'kategori' => 'Heritage Suite',
                 'tagline' => 'Akses langsung ke tepi kolam laguna.',
                 'deskripsi_lengkap' => 'Teras santai berlantai kayu dengan akses langsung menuju kolam renang laguna biru resor.',
-                'tarif' => 300000,
+                'tarif' => $summary['Standar']['min_harga'],
                 'luas' => '48 m²',
                 'kapasitas' => '2 Tamu Dewasa',
                 'ranjang' => '1 Tempat Tidur Queen',
@@ -476,7 +436,7 @@ class BookingController extends Controller
                 ],
                 'fasilitas_lengkap' => $standarFasilitasLengkap,
                 'foto' => 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80',
-                'fallback_foto' => asset('storage/rooms/demo-suite-1.png'),
+                'fallback_foto' => asset('images/rooms/demo-suite-1.png'),
                 'unit_tersedia' => $standarTersedia,
                 'total_unit' => $standarTotal,
             ],
@@ -486,7 +446,7 @@ class BookingController extends Controller
                 'kategori' => 'Heritage Suite',
                 'tagline' => 'Dua ranjang nyaman & panorama perbukitan.',
                 'deskripsi_lengkap' => 'Kamar tenang dengan dua ranjang ergonomis dan sudut meja kerja menghadap panorama perbukitan asri.',
-                'tarif' => 300000,
+                'tarif' => $summary['Standar']['min_harga'],
                 'luas' => '50 m²',
                 'kapasitas' => '2 Tamu Dewasa',
                 'ranjang' => '2 Tempat Tidur Single Ergonomis',
@@ -500,7 +460,7 @@ class BookingController extends Controller
                 ],
                 'fasilitas_lengkap' => $standarFasilitasLengkap,
                 'foto' => 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=1200&q=80',
-                'fallback_foto' => asset('storage/rooms/demo-suite-1.png'),
+                'fallback_foto' => asset('images/rooms/demo-suite-1.png'),
                 'unit_tersedia' => $standarTersedia,
                 'total_unit' => $standarTotal,
             ],
@@ -510,7 +470,7 @@ class BookingController extends Controller
                 'kategori' => 'Executive Villa',
                 'tagline' => 'Balkon samudra & bathtub teraso terbuka.',
                 'deskripsi_lengkap' => 'Vila tepi pantai dengan balkon privat pemandangan samudra lepas, bathtub teraso terbuka, dan teh sore harian.',
-                'tarif' => 550000,
+                'tarif' => $summary['Deluxe']['min_harga'],
                 'luas' => '65 m²',
                 'kapasitas' => '2 Tamu Dewasa',
                 'ranjang' => '1 Tempat Tidur King',
@@ -523,7 +483,7 @@ class BookingController extends Controller
                     'Mesin Pembuat Kopi Espresso Kapsul',
                 ],
                 'fasilitas_lengkap' => $deluxeFasilitasLengkap,
-                'foto' => asset('storage/rooms/demo-suite-2.png'),
+                'foto' => asset('images/rooms/demo-suite-2.png'),
                 'fallback_foto' => 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1200&q=80',
                 'unit_tersedia' => $deluxeTersedia,
                 'total_unit' => $deluxeTotal,
@@ -534,7 +494,7 @@ class BookingController extends Controller
                 'kategori' => 'Executive Villa',
                 'tagline' => 'Jacuzzi privat terapung di atas laguna.',
                 'deskripsi_lengkap' => 'Vila berkonsep terapung di atas laguna dengan jacuzzi luar ruangan pribadi dan dek santai sunset.',
-                'tarif' => 550000,
+                'tarif' => $summary['Deluxe']['min_harga'],
                 'luas' => '70 m²',
                 'kapasitas' => '2 Tamu Dewasa',
                 'ranjang' => '1 Tempat Tidur King',
@@ -548,7 +508,7 @@ class BookingController extends Controller
                 ],
                 'fasilitas_lengkap' => $deluxeFasilitasLengkap,
                 'foto' => 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1200&q=80',
-                'fallback_foto' => asset('storage/rooms/demo-suite-2.png'),
+                'fallback_foto' => asset('images/rooms/demo-suite-2.png'),
                 'unit_tersedia' => $deluxeTersedia,
                 'total_unit' => $deluxeTotal,
             ],
@@ -558,7 +518,7 @@ class BookingController extends Controller
                 'kategori' => 'Executive Villa',
                 'tagline' => 'Gazebo privat di tengah taman tropis.',
                 'deskripsi_lengkap' => 'Vila asri berpagar pepohonan rimbun dengan gazebo pribadi, walk-in dressing room, dan shower luar ruang.',
-                'tarif' => 550000,
+                'tarif' => $summary['Deluxe']['min_harga'],
                 'luas' => '68 m²',
                 'kapasitas' => '2 Tamu Dewasa',
                 'ranjang' => '1 Tempat Tidur King',
@@ -572,7 +532,7 @@ class BookingController extends Controller
                 ],
                 'fasilitas_lengkap' => $deluxeFasilitasLengkap,
                 'foto' => 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80',
-                'fallback_foto' => asset('storage/rooms/demo-suite-2.png'),
+                'fallback_foto' => asset('images/rooms/demo-suite-2.png'),
                 'unit_tersedia' => $deluxeTersedia,
                 'total_unit' => $deluxeTotal,
             ],
@@ -582,7 +542,7 @@ class BookingController extends Controller
                 'kategori' => 'Presidential Penthouse',
                 'tagline' => 'Plunge pool rooftop & butler pribadi 24 jam.',
                 'deskripsi_lengkap' => 'Penthouse puncak dengan plunge pool rooftop 360 derajat, ruang perjamuan terpisah, dan layanan butler 24 jam.',
-                'tarif' => 950000,
+                'tarif' => $summary['Suite']['min_harga'],
                 'luas' => '120 m²',
                 'kapasitas' => '4 Tamu Dewasa',
                 'ranjang' => '1 Super King + 2 Twin Bed',
@@ -595,7 +555,7 @@ class BookingController extends Controller
                     'Fasilitas Check-in & Check-out Dalam Kamar',
                 ],
                 'fasilitas_lengkap' => $suiteFasilitasLengkap,
-                'foto' => asset('storage/rooms/demo-suite-3.png'),
+                'foto' => asset('images/rooms/demo-suite-3.png'),
                 'fallback_foto' => 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1200&q=80',
                 'unit_tersedia' => $suiteTersedia,
                 'total_unit' => $suiteTotal,
@@ -606,7 +566,7 @@ class BookingController extends Controller
                 'kategori' => 'Presidential Penthouse',
                 'tagline' => 'Duplex dua lantai dengan bioskop privat.',
                 'deskripsi_lengkap' => 'Unit duplex dua lantai dengan private cinema Dolby Atmos, dek bintang teleskopik, dan akses helipad VIP.',
-                'tarif' => 950000,
+                'tarif' => $summary['Suite']['min_harga'],
                 'luas' => '160 m²',
                 'kapasitas' => '4 Tamu Dewasa',
                 'ranjang' => '2 Tempat Tidur King',
@@ -620,7 +580,7 @@ class BookingController extends Controller
                 ],
                 'fasilitas_lengkap' => $suiteFasilitasLengkap,
                 'foto' => 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80',
-                'fallback_foto' => asset('storage/rooms/demo-suite-3.png'),
+                'fallback_foto' => asset('images/rooms/demo-suite-3.png'),
                 'unit_tersedia' => $suiteTersedia,
                 'total_unit' => $suiteTotal,
             ],
@@ -630,7 +590,7 @@ class BookingController extends Controller
                 'kategori' => 'Presidential Penthouse',
                 'tagline' => 'Tiga kamar tidur & kolam renang infinity 15m.',
                 'deskripsi_lengkap' => 'Kediaman tiga kamar tidur utama dengan infinity pool privat 15 meter, dapur chef, dan layanan sopir mewah.',
-                'tarif' => 950000,
+                'tarif' => $summary['Suite']['min_harga'],
                 'luas' => '220 m²',
                 'kapasitas' => '6 Tamu Dewasa',
                 'ranjang' => '3 Tempat Tidur King Master',
@@ -644,14 +604,14 @@ class BookingController extends Controller
                 ],
                 'fasilitas_lengkap' => $suiteFasilitasLengkap,
                 'foto' => 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
-                'fallback_foto' => asset('storage/rooms/demo-suite-3.png'),
+                'fallback_foto' => asset('images/rooms/demo-suite-3.png'),
                 'unit_tersedia' => $suiteTersedia,
                 'total_unit' => $suiteTotal,
             ],
         ];
 
-        $totalTersedia = Kamar::where('status', 'Tersedia')->where('status_kebersihan', 'Bersih')->count();
-        $totalKamar = Kamar::count();
+        $totalTersedia = $standarTersedia + $deluxeTersedia + $suiteTersedia;
+        $totalKamar = $standarTotal + $deluxeTotal + $suiteTotal;
 
         return view('pelanggan.kamar', compact('user', 'daftarKamar', 'totalTersedia', 'totalKamar'));
     }
@@ -662,67 +622,8 @@ class BookingController extends Controller
     public function dashboard(Request $request)
     {
         $user = Auth::user();
-
-        // 1. Ambil data katalog kamar & ketersediaan unit
-        $daftarKamar = [
-            'Standar' => [
-                'nama' => 'Suite Standar Heritage',
-                'tipe' => 'Standar',
-                'tarif' => 300000,
-                'luas' => '45 m²',
-                'kapasitas' => '2 Tamu Dewasa',
-                'ranjang' => '1 Tempat Tidur Queen',
-                'fasilitas' => [
-                    'Termasuk Sarapan Pagi Mewah',
-                    'Akses Wi-Fi Kecepatan Tinggi',
-                    'Smart TV 50 Inci & Saluran Kabel',
-                    'Kamar Mandi Marmer & Perlengkapan Mandi Premium',
-                    'Pendingin Udara AC Individual',
-                ],
-                'foto' => asset('storage/rooms/demo-suite-1.png'),
-                'fallback_foto' => 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=800&q=80',
-                'unit_tersedia' => Kamar::where('tipe', 'Standar')->where('status', 'Tersedia')->where('status_kebersihan', 'Bersih')->count(),
-                'total_unit' => Kamar::where('tipe', 'Standar')->count(),
-            ],
-            'Deluxe' => [
-                'nama' => 'Villa Eksekutif Tepi Laut',
-                'tipe' => 'Deluxe',
-                'tarif' => 550000,
-                'luas' => '65 m²',
-                'kapasitas' => '2 Tamu Dewasa',
-                'ranjang' => '1 Tempat Tidur King',
-                'fasilitas' => [
-                    'Sajian Teh Sore Gratis Setiap Hari',
-                    'Balkon Privat Menghadap Senja',
-                    'Bathtub Teraso Terbuka & Rain Shower',
-                    'Minibar Pilihan Gratis Saat Kedatangan',
-                    'Mesin Pembuat Kopi Espresso Kapsul',
-                ],
-                'foto' => asset('storage/rooms/demo-suite-2.png'),
-                'fallback_foto' => 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80',
-                'unit_tersedia' => Kamar::where('tipe', 'Deluxe')->where('status', 'Tersedia')->where('status_kebersihan', 'Bersih')->count(),
-                'total_unit' => Kamar::where('tipe', 'Deluxe')->count(),
-            ],
-            'Suite' => [
-                'nama' => 'Penthouse Presidensial',
-                'tipe' => 'Suite',
-                'tarif' => 950000,
-                'luas' => '120 m²',
-                'kapasitas' => '4 Tamu Dewasa',
-                'ranjang' => '1 Super King + 2 Twin Bed',
-                'fasilitas' => [
-                    'Layanan Butler Pribadi Berdedikasi 24 Jam',
-                    'Kolam Renang Rendam Privat di Rooftop',
-                    'Ruang Tamu Formal & Meja Makan Terpisah',
-                    'Jamuan Makan Malam Selamat Datang',
-                    'Fasilitas Check-in & Check-out di Dalam Kamar',
-                ],
-                'foto' => asset('storage/rooms/demo-suite-3.png'),
-                'fallback_foto' => 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80',
-                'unit_tersedia' => Kamar::where('tipe', 'Suite')->where('status', 'Tersedia')->where('status_kebersihan', 'Bersih')->count(),
-                'total_unit' => Kamar::where('tipe', 'Suite')->count(),
-            ],
-        ];
+        $summary = $this->roomSummaryByType();
+        $daftarKamar = $this->baseRoomCatalog($summary);
 
         // 2. Ambil seluruh riwayat pemesanan milik tamu ini
         $riwayatPemesanan = Pemesanan::where('tamu_id', $user->id)
@@ -738,6 +639,98 @@ class BookingController extends Controller
         ];
 
         return view('pelanggan.dashboard', compact('daftarKamar', 'riwayatPemesanan', 'stats', 'user'));
+    }
+
+    private function roomSummaryByType(): array
+    {
+        $defaults = [
+            'Standar' => 300000,
+            'Deluxe' => 550000,
+            'Suite' => 950000,
+        ];
+
+        $rows = Kamar::select('tipe')
+            ->selectRaw('count(*) as total_unit')
+            ->selectRaw("sum(case when status = 'Tersedia' and status_kebersihan = 'Bersih' then 1 else 0 end) as tersedia_count")
+            ->selectRaw('min(harga_per_malam) as min_harga')
+            ->groupBy('tipe')
+            ->get()
+            ->keyBy('tipe');
+
+        $summary = [];
+        foreach ($defaults as $tipe => $defaultHarga) {
+            $row = $rows->get($tipe);
+            $summary[$tipe] = [
+                'total' => (int) ($row->total_unit ?? 0),
+                'tersedia' => (int) ($row->tersedia_count ?? 0),
+                'min_harga' => (int) ($row->min_harga ?? $defaultHarga),
+            ];
+        }
+
+        return $summary;
+    }
+
+    private function baseRoomCatalog(array $summary): array
+    {
+        return [
+            'Standar' => [
+                'nama' => 'Suite Standar Heritage',
+                'tipe' => 'Standar',
+                'tarif' => $summary['Standar']['min_harga'],
+                'luas' => '45 m²',
+                'kapasitas' => '2 Tamu Dewasa',
+                'ranjang' => '1 Tempat Tidur Queen',
+                'fasilitas' => [
+                    'Termasuk Sarapan Pagi Mewah',
+                    'Akses Wi-Fi Kecepatan Tinggi',
+                    'Smart TV 50 Inci & Saluran Kabel',
+                    'Kamar Mandi Marmer & Perlengkapan Mandi Premium',
+                    'Pendingin Udara AC Individual',
+                ],
+                'foto' => asset('images/rooms/demo-suite-1.png'),
+                'fallback_foto' => 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=800&q=80',
+                'unit_tersedia' => $summary['Standar']['tersedia'],
+                'total_unit' => $summary['Standar']['total'],
+            ],
+            'Deluxe' => [
+                'nama' => 'Villa Eksekutif Tepi Laut',
+                'tipe' => 'Deluxe',
+                'tarif' => $summary['Deluxe']['min_harga'],
+                'luas' => '65 m²',
+                'kapasitas' => '2 Tamu Dewasa',
+                'ranjang' => '1 Tempat Tidur King',
+                'fasilitas' => [
+                    'Sajian Teh Sore Gratis Setiap Hari',
+                    'Balkon Privat Menghadap Senja',
+                    'Bathtub Teraso Terbuka & Rain Shower',
+                    'Minibar Pilihan Gratis Saat Kedatangan',
+                    'Mesin Pembuat Kopi Espresso Kapsul',
+                ],
+                'foto' => asset('images/rooms/demo-suite-2.png'),
+                'fallback_foto' => 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80',
+                'unit_tersedia' => $summary['Deluxe']['tersedia'],
+                'total_unit' => $summary['Deluxe']['total'],
+            ],
+            'Suite' => [
+                'nama' => 'Penthouse Presidensial',
+                'tipe' => 'Suite',
+                'tarif' => $summary['Suite']['min_harga'],
+                'luas' => '120 m²',
+                'kapasitas' => '4 Tamu Dewasa',
+                'ranjang' => '1 Super King + 2 Twin Bed',
+                'fasilitas' => [
+                    'Layanan Butler Pribadi Berdedikasi 24 Jam',
+                    'Kolam Renang Rendam Privat di Rooftop',
+                    'Ruang Tamu Formal & Meja Makan Terpisah',
+                    'Jamuan Makan Malam Selamat Datang',
+                    'Fasilitas Check-in & Check-out di Dalam Kamar',
+                ],
+                'foto' => asset('images/rooms/demo-suite-3.png'),
+                'fallback_foto' => 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80',
+                'unit_tersedia' => $summary['Suite']['tersedia'],
+                'total_unit' => $summary['Suite']['total'],
+            ],
+        ];
     }
 
     /**

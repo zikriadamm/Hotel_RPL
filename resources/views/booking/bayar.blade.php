@@ -236,6 +236,7 @@
 
             </div>
 
+            @if (config('app.demo_enabled'))
             <!-- ================================================================
                  WIDGET SIMULATOR PEMBAYARAN CEPAT (Pengujian & Demo Sidang)
                  ================================================================ -->
@@ -279,6 +280,7 @@
                     </a>
                 </div>
             </div>
+            @endif
 
         </div>
 

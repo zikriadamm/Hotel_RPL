@@ -25,7 +25,6 @@ Route::post('/booking', [BookingController::class, 'store'])->name('booking.stor
 Route::get('/booking/bayar/{pemesanan}', [BookingController::class, 'bayar'])->name('booking.bayar')->middleware('auth');
 Route::get('/booking/status/{pemesanan}', [BookingController::class, 'statusPembayaran'])->name('booking.status')->middleware('auth');
 Route::post('/booking/simulasi-bayar/{pemesanan}', [BookingController::class, 'simulasiBayar'])->name('booking.simulasi_bayar')->middleware('auth');
-Route::post('/api/webhook/qris', [BookingController::class, 'webhookQris'])->name('api.webhook.qris');
 Route::get('/booking/sukses/{pemesanan}', [BookingController::class, 'sukses'])->name('booking.sukses')->middleware('auth');
 
 // ==========================================

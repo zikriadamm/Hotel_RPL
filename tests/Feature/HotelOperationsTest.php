@@ -516,7 +516,9 @@ class HotelOperationsTest extends TestCase
             'pembuat_id' => $this->tamu->id,
         ]);
 
-        $response = $this->postJson(route('api.webhook.qris'), [
+        $response = $this->withHeaders([
+            'X-Webhook-Secret' => 'test-qris-secret',
+        ])->postJson(route('api.webhook.qris'), [
             'order_id' => 'BKG-WEBHOOK-99',
             'transaction_status' => 'settlement',
             'gross_amount' => 600000,
@@ -677,5 +679,115 @@ class HotelOperationsTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('error');
         $this->assertEquals('Dipesan', $pemesanan->fresh()->status);
+    }
+
+    /** Test 32: Webhook QRIS ditolak (403) jika signature secret tidak cocok */
+    public function test_webhook_qris_ditolak_jika_secret_tidak_valid(): void
+    {
+        $pemesanan = Pemesanan::create([
+            'kode_booking' => 'BKG-WEBHOOK-BAD',
+            'tamu_id' => $this->tamu->id,
+            'kamar_id' => $this->kamar->id,
+            'tanggal_check_in' => now()->addDays(12)->toDateString(),
+            'tanggal_check_out' => now()->addDays(14)->toDateString(),
+            'total_harga' => 600000,
+            'status' => 'Dipesan',
+            'pembuat_id' => $this->tamu->id,
+        ]);
+
+        $response = $this->withHeaders([
+            'X-Webhook-Secret' => 'salah-secret',
+        ])->postJson(route('api.webhook.qris'), [
+            'order_id' => 'BKG-WEBHOOK-BAD',
+            'transaction_status' => 'settlement',
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertDatabaseMissing('pembayarans', ['pemesanan_id' => $pemesanan->id]);
+    }
+
+    /** Test 33: Demo login dan simulasi bayar diblokir saat mode demo nonaktif (produksi) */
+    public function test_demo_login_dan_simulasi_bayar_ditolak_saat_mode_demo_nonaktif(): void
+    {
+        config(['app.demo_enabled' => false]);
+
+        $this->get(route('demo.login', 'Manajer'))->assertStatus(403);
+
+        $pemesanan = Pemesanan::create([
+            'kode_booking' => 'BKG-PROD-SIM',
+            'tamu_id' => $this->tamu->id,
+            'kamar_id' => $this->kamar->id,
+            'tanggal_check_in' => now()->addDays(12)->toDateString(),
+            'tanggal_check_out' => now()->addDays(14)->toDateString(),
+            'total_harga' => 600000,
+            'status' => 'Dipesan',
+            'pembuat_id' => $this->tamu->id,
+        ]);
+
+        $this->actingAs($this->tamu)
+            ->post(route('booking.simulasi_bayar', $pemesanan->id))
+            ->assertStatus(403);
+    }
+
+    /** Test 34: Login redirect bayar tanpa booking milik user diarahkan aman tanpa error 500 */
+    public function test_login_redirect_bayar_saat_tidak_ada_booking_tidak_error_500(): void
+    {
+        $response = $this->post(route('login'), [
+            'email' => $this->tamu->email,
+            'password' => 'password123',
+            'redirect' => 'bayar',
+        ]);
+
+        $response->assertRedirect(route('pelanggan.kamar'));
+    }
+
+    /** Test 35: Pemesanan tanggal masa depan berhasil meski kamar sedang Terisi atau Kotor hari ini */
+    public function test_pemesanan_tanggal_masa_depan_berhasil_meski_kamar_terisi_hari_ini(): void
+    {
+        $this->kamar->update([
+            'status' => 'Terisi',
+            'status_kebersihan' => 'Kotor',
+        ]);
+
+        $response = $this->actingAs($this->tamu)->post(route('booking.store'), [
+            'tipe_kamar' => $this->kamar->tipe,
+            'tanggal_check_in' => now()->addDays(7)->toDateString(),
+            'tanggal_check_out' => now()->addDays(9)->toDateString(),
+            'nama' => $this->tamu->nama,
+            'email' => $this->tamu->email,
+            'no_identitas' => $this->tamu->no_identitas,
+            'no_hp' => '08123456789',
+            'metode_pembayaran' => 'Tunai',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+        $this->assertDatabaseHas('pemesanans', [
+            'kamar_id' => $this->kamar->id,
+            'tamu_id' => $this->tamu->id,
+            'status' => 'Dipesan',
+        ]);
+    }
+
+    /** Test 36: Laporan okupansi menganggap kamar kosong pada tanggal check-out tamu */
+    public function test_laporan_okupansi_tidak_menghitung_kamar_pada_hari_check_out(): void
+    {
+        Pemesanan::create([
+            'kode_booking' => 'BKG-CHECKOUT-TODAY',
+            'tamu_id' => $this->tamu->id,
+            'kamar_id' => $this->kamar->id,
+            'tanggal_check_in' => today()->subDays(2)->toDateString(),
+            'tanggal_check_out' => today()->toDateString(),
+            'total_harga' => 600000,
+            'status' => 'Check-in',
+            'pembuat_id' => $this->resepsionis->id,
+        ]);
+
+        $response = $this->actingAs($this->manajer)->get(route('laporan.okupansi', [
+            'tanggal' => today()->toDateString(),
+        ]));
+
+        $response->assertOk();
+        $this->assertEquals(0, $response->viewData('kamarTerisiCount'));
     }
 }

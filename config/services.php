@@ -31,4 +31,8 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'qris' => [
+        'webhook_secret' => env('QRIS_WEBHOOK_SECRET'),
+    ],
+
 ];

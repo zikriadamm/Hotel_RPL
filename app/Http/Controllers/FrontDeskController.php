@@ -99,42 +99,52 @@ class FrontDeskController extends Controller
             'tanggal_check_out.after' => 'Tanggal check-out harus setelah tanggal check-in.',
         ]);
 
-        $kamar = Kamar::findOrFail($validated['kamar_id']);
-
-        if ($kamar->status !== 'Tersedia' || $kamar->status_kebersihan !== 'Bersih') {
-            return back()->with('error', 'Kamar nomor ' . $kamar->nomor_kamar . ' sedang tidak tersedia untuk dipesan.');
-        }
-
-        // Cek bentrok tanggal reservasi (cegah double booking)
-        $bentrok = Pemesanan::where('kamar_id', $kamar->id)
-            ->whereIn('status', ['Dipesan', 'Check-in'])
-            ->where('tanggal_check_in', '<', $validated['tanggal_check_out'])
-            ->where('tanggal_check_out', '>', $validated['tanggal_check_in'])
-            ->exists();
-
-        if ($bentrok) {
-            return back()->with('error', 'Kamar nomor ' . $kamar->nomor_kamar . ' sudah memiliki reservasi aktif pada rentang tanggal tersebut.');
-        }
-
         $checkIn = Carbon::parse($validated['tanggal_check_in']);
         $checkOut = Carbon::parse($validated['tanggal_check_out']);
         $durasiMalam = max(1, $checkIn->diffInDays($checkOut));
-        $totalHarga = $durasiMalam * $kamar->harga_per_malam;
 
-        $kodeBooking = Pemesanan::generateKodeBooking();
+        $result = DB::transaction(function () use ($validated, $checkIn, $durasiMalam) {
+            $kamar = Kamar::whereKey($validated['kamar_id'])->lockForUpdate()->firstOrFail();
 
-        Pemesanan::create([
-            'kode_booking' => $kodeBooking,
-            'tamu_id' => $validated['tamu_id'],
-            'kamar_id' => $kamar->id,
-            'tanggal_check_in' => $validated['tanggal_check_in'],
-            'tanggal_check_out' => $validated['tanggal_check_out'],
-            'total_harga' => $totalHarga,
-            'status' => 'Dipesan',
-            'pembuat_id' => auth()->id(),
-        ]);
+            if ($kamar->status === 'Perawatan') {
+                return 'Kamar nomor ' . $kamar->nomor_kamar . ' sedang dalam perawatan.';
+            }
 
-        return back()->with('success', "Pemesanan berhasil dibuat dengan Kode Booking: {$kodeBooking}.");
+            if ($checkIn->isToday() && ($kamar->status !== 'Tersedia' || $kamar->status_kebersihan !== 'Bersih')) {
+                return 'Kamar nomor ' . $kamar->nomor_kamar . ' sedang tidak tersedia untuk check-in hari ini.';
+            }
+
+            $bentrok = Pemesanan::where('kamar_id', $kamar->id)
+                ->whereIn('status', ['Dipesan', 'Check-in'])
+                ->where('tanggal_check_in', '<', $validated['tanggal_check_out'])
+                ->where('tanggal_check_out', '>', $validated['tanggal_check_in'])
+                ->exists();
+
+            if ($bentrok) {
+                return 'Kamar nomor ' . $kamar->nomor_kamar . ' sudah memiliki reservasi aktif pada rentang tanggal tersebut.';
+            }
+
+            $kodeBooking = Pemesanan::generateKodeBooking();
+
+            Pemesanan::create([
+                'kode_booking' => $kodeBooking,
+                'tamu_id' => $validated['tamu_id'],
+                'kamar_id' => $kamar->id,
+                'tanggal_check_in' => $validated['tanggal_check_in'],
+                'tanggal_check_out' => $validated['tanggal_check_out'],
+                'total_harga' => $durasiMalam * $kamar->harga_per_malam,
+                'status' => 'Dipesan',
+                'pembuat_id' => auth()->id(),
+            ]);
+
+            return ['kode' => $kodeBooking];
+        });
+
+        if (is_string($result)) {
+            return back()->with('error', $result);
+        }
+
+        return back()->with('success', "Pemesanan berhasil dibuat dengan Kode Booking: {$result['kode']}.");
     }
 
     public function checkIn(Pemesanan $pemesanan)
@@ -143,17 +153,20 @@ class FrontDeskController extends Controller
             return back()->with('error', 'Hanya pemesanan dengan status "Dipesan" yang dapat di-check-in.');
         }
 
-        $kamar = $pemesanan->kamar;
-        if ($kamar->status !== 'Tersedia' || $kamar->status_kebersihan !== 'Bersih') {
-            return back()->with('error', "Kamar {$kamar->nomor_kamar} belum siap ditempati (Status: {$kamar->status}, Kebersihan: {$kamar->status_kebersihan}).");
-        }
+        $errorMessage = DB::transaction(function () use ($pemesanan) {
+            $kamar = Kamar::whereKey($pemesanan->kamar_id)->lockForUpdate()->firstOrFail();
+            if ($kamar->status !== 'Tersedia' || $kamar->status_kebersihan !== 'Bersih') {
+                return "Kamar {$kamar->nomor_kamar} belum siap ditempati (Status: {$kamar->status}, Kebersihan: {$kamar->status_kebersihan}).";
+            }
 
-        DB::transaction(function () use ($pemesanan) {
             $pemesanan->update(['status' => 'Check-in']);
-            $pemesanan->kamar->update([
-                'status' => 'Terisi',
-            ]);
+            $kamar->update(['status' => 'Terisi']);
+            return null;
         });
+
+        if ($errorMessage !== null) {
+            return back()->with('error', $errorMessage);
+        }
 
         return back()->with('success', "Tamu berhasil Check-in ke kamar {$pemesanan->kamar->nomor_kamar}. Status kamar kini Terisi.");
     }

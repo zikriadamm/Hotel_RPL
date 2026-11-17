@@ -87,6 +87,8 @@ class AuthController extends Controller
 
     public function demoLogin(string $peran)
     {
+        abort_unless(config('app.demo_enabled'), 403, 'Simulasi login demo tidak aktif di lingkungan produksi.');
+
         $peranNormalized = in_array(strtolower($peran), ['pelanggan', 'tamu']) ? 'Tamu' : $peran;
         $user = User::where('peran', $peranNormalized)->where('aktif', true)->first();
 
@@ -113,12 +115,12 @@ class AuthController extends Controller
     {
         if ($user->peran === 'Tamu') {
             if (request('redirect') === 'bayar') {
-                $bookingId = request('id') ?? \App\Models\Pemesanan::latest()->first()->id;
-                return redirect()->route('booking.bayar', $bookingId);
+                $bookingId = request('id') ?: $user->pemesanansSebagaiTamu()->latest()->value('id');
+                return $bookingId ? redirect()->route('booking.bayar', $bookingId) : redirect()->route('pelanggan.kamar');
             }
             if (request('redirect') === 'voucher') {
-                $bookingId = request('id') ?? \App\Models\Pemesanan::latest()->first()->id;
-                return redirect()->route('booking.sukses', $bookingId);
+                $bookingId = request('id') ?: $user->pemesanansSebagaiTamu()->latest()->value('id');
+                return $bookingId ? redirect()->route('booking.sukses', $bookingId) : redirect()->route('pelanggan.kamar');
             }
             if (request('redirect') === 'riwayat') {
                 return redirect()->route('pelanggan.dashboard');

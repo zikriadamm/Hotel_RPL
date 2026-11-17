@@ -44,6 +44,8 @@ return [
 
     'debug' => (bool) env('APP_DEBUG', false),
 
+    'demo_enabled' => (bool) env('APP_DEMO', in_array(env('APP_ENV', 'production'), ['local', 'testing'], true)),
+
     /*
     |--------------------------------------------------------------------------
     | Application URL
@@ -70,7 +72,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => env('APP_TIMEZONE', 'Asia/Makassar'),
 
     /*
     |--------------------------------------------------------------------------

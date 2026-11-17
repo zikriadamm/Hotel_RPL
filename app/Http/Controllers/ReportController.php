@@ -21,13 +21,14 @@ class ReportController extends Controller
         $kamars = Kamar::orderBy('nomor_kamar')->get();
         $totalKamar = $kamars->count();
 
-        // Cari pemesanan yang aktif pada tanggal terpilih
+        // Cari pemesanan yang aktif pada malam tanggal terpilih (hari check-out dianggap kosong)
         $pemesananAktif = Pemesanan::with('tamu')
             ->whereDate('tanggal_check_in', '<=', $tanggal)
-            ->whereDate('tanggal_check_out', '>=', $tanggal)
+            ->whereDate('tanggal_check_out', '>', $tanggal)
             ->whereIn('status', ['Check-in', 'Dipesan'])
             ->get()
-            ->keyBy('kamar_id');
+            ->groupBy('kamar_id')
+            ->map(fn ($group) => $group->firstWhere('status', 'Check-in') ?? $group->first());
 
         $kamarData = $kamars->map(function ($kamar) use ($pemesananAktif, $tanggal) {
             $pemesanan = $pemesananAktif->get($kamar->id);
