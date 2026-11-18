@@ -184,10 +184,10 @@
         </svg>
         <div class="col-content">
           <span class="col-label">Tanggal Menginap</span>
-          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-            <input type="date" class="col-input" style="flex: 1; min-width: 112px;" x-model="checkIn" min="{{ date('Y-m-d') }}">
+          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: nowrap;">
+            <input type="date" class="col-input" style="flex: 1; min-width: 0; width: auto;" x-model="checkIn" min="{{ date('Y-m-d') }}">
             <span style="color: var(--gold-600); flex-shrink: 0;">&rarr;</span>
-            <input type="date" class="col-input" style="flex: 1; min-width: 112px;" x-model="checkOut" :min="checkIn">
+            <input type="date" class="col-input" style="flex: 1; min-width: 0; width: auto;" x-model="checkOut" :min="checkIn">
           </div>
         </div>
       </div>
