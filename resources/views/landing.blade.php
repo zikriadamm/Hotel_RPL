@@ -16,9 +16,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Yellowtail&display=swap" rel="stylesheet">
   
   <!-- ScrollCraft Engine Runtime Styles -->
-  <link rel="stylesheet" href="{{ asset('css/scrollcraft.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/scrollcraft.css') }}?v={{ filemtime(public_path('css/scrollcraft.css')) }}">
   <!-- Lumina Grand Design System Stylesheet -->
-  <link rel="stylesheet" href="{{ asset('css/lumina-grand.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/lumina-grand.css') }}?v={{ filemtime(public_path('css/lumina-grand.css')) }}">
   <!-- Alpine.js Reactive Engine -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
@@ -137,7 +137,7 @@
         Kamar Nyaman untuk Perjalanan Kerja <span class="script-accent">dan Liburan Keluarga</span>
       </h1>
       
-      <p class="hero-desc">
+      <p class="hero-desc" style="width: 100%; max-width: 660px; margin: 0 auto 2rem auto; text-align: center; text-wrap: balance;">
         Tersedia {{ $totalKamar ?? 14 }} kamar Standar, Deluxe, dan Suite mulai Rp 300.000 per malam. Pesan langsung lewat web dengan pembayaran tunai, transfer, atau QRIS.
       </p>
 

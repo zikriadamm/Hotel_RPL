@@ -292,8 +292,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   color: rgba(255, 255, 255, 0.88);
   font-size: clamp(1rem, 1.3vw, 1.15rem);
   line-height: 1.65;
-  max-width: 620px;
+  width: 100%;
+  max-width: 660px;
   margin: 0 auto 2rem auto;
+  text-align: center;
+  text-wrap: balance;
 }
 
 /* -------------------------------------------------------------------------
