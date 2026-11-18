@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZSL Residence Hotel &amp; Resor — Kemewahan Modern yang Hangat</title>
+  <title>ZSL Residence Hotel &amp; Resor</title>
   <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="48x48">
   <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
   <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
@@ -25,13 +25,24 @@
 <body x-data="{
     openAuthPrompt: {{ !auth()->check() ? (request('booking') ? 'true' : 'false') : 'false' }},
     isLoggedIn: {{ auth()->check() ? 'true' : 'false' }},
+    tipeKamar: 'Standar',
+    selectedTipe: '',
     checkIn: '{{ date('Y-m-d') }}',
     checkOut: '{{ date('Y-m-d', strtotime('+1 day')) }}',
+    bookingQuery() {
+      var params = new URLSearchParams();
+      if (this.selectedTipe) params.set('tipe', this.selectedTipe);
+      if (this.checkIn) params.set('check_in', this.checkIn);
+      if (this.checkOut) params.set('check_out', this.checkOut);
+      return params.toString();
+    },
     mulaiBooking(tipe) {
+      this.selectedTipe = tipe || this.tipeKamar || '';
       if (!this.isLoggedIn) {
         this.openAuthPrompt = true;
       } else {
-        window.location.href = '{{ route('booking.form') }}' + (tipe ? '?tipe=' + encodeURIComponent(tipe) : '');
+        var qs = this.bookingQuery();
+        window.location.href = '{{ route('booking.form') }}' + (qs ? '?' + qs : '');
       }
     }
   }" :class="{ 'modal-open': openAuthPrompt }">
@@ -63,11 +74,6 @@
   @endif
 
   <!-- ========================================================================
-       Scroll Progress Bar (Garis Progres Emas 3px Puncak Layar)
-       ======================================================================== -->
-  <div class="lumina-scroll-progress" id="scroll-progress"></div>
-
-  <!-- ========================================================================
        Bilah Navigasi Atas (Sticky Nav)
        ======================================================================== -->
   <header class="lumina-nav">
@@ -76,10 +82,10 @@
     </a>
 
     <nav class="nav-links">
-      <a href="#experiences" class="active">Pengalaman</a>
-      <a href="#philosophy">Filosofi</a>
-      <a href="#suites">Akomodasi</a>
-      <a href="#story">Pelayanan</a>
+      <a href="#experiences" class="active">Beranda</a>
+      <a href="#philosophy">Informasi</a>
+      <a href="#suites">Pilihan Kamar</a>
+      <a href="#story">Layanan</a>
     </nav>
 
     <div class="nav-actions">
@@ -125,33 +131,24 @@
 
     <!-- Konten Utama Hero -->
     <div class="hero-stage-content">
-      <span class="eyebrow" style="color: var(--gold-300);">Puncak Keramahan yang Hangat</span>
+      <span class="eyebrow" style="color: var(--gold-300);">ZSL Residence Hotel &amp; Resor</span>
       
-      <!-- Signature Move: Aksen Tulisan Sambung -->
       <h1 class="hero-title">
-        Kemegahan Arsitektur Berpadu <span class="script-accent">Ketenangan Abadi</span>
+        Kamar Nyaman untuk Perjalanan Kerja <span class="script-accent">dan Liburan Keluarga</span>
       </h1>
       
       <p class="hero-desc">
-        Setiap ruang dirancang dengan perpaduan wibawa modern dan kehangatan personal, menghadirkan peristirahatan bintang lima yang melampaui ekspektasi.
+        Tersedia {{ $totalKamar ?? 14 }} kamar Standar, Deluxe, dan Suite mulai Rp 300.000 per malam. Pesan langsung lewat web dengan pembayaran tunai, transfer, atau QRIS.
       </p>
 
       <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 1.5rem;">
-        <a href="#suites" class="btn-pill-gold" data-sc-magnet="0.2">
-          <span>Jelajahi Suite Kamar</span>
+        <a href="#suites" class="btn-pill-gold">
+          <span>Lihat Pilihan Kamar</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
         <a href="#booking" class="btn-pill-navy" style="background: rgba(10, 21, 38, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2);">
-          <span>Cek Ketersediaan</span>
+          <span>Cek Jadwal Menginap</span>
         </a>
-      </div>
-    </div>
-
-    <!-- Penanda Gulir Halaman -->
-    <div class="scroll-cue" id="scroll-cue">
-      <span class="scroll-cue-text">Gulir untuk eksplorasi</span>
-      <div class="scroll-cue-pill">
-        <div class="scroll-cue-dot"></div>
       </div>
     </div>
   </section>
@@ -159,20 +156,20 @@
   <!-- ========================================================================
        Bilah Formulir Melayang (Floating Booking Bar)
        ======================================================================== -->
-  <div class="floating-bar-anchor" id="booking" data-sc-in="scale">
-    <form @submit.prevent="mulaiBooking()" class="floating-bar">
-      <!-- Kolom 1: Destinasi & Pilihan Akomodasi -->
+  <div class="floating-bar-anchor" id="booking">
+    <form @submit.prevent="mulaiBooking(tipeKamar)" class="floating-bar">
+      <!-- Kolom 1: Pilihan Tipe Kamar -->
       <div class="floating-col">
         <svg class="col-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
           <circle cx="12" cy="10" r="3"></circle>
         </svg>
         <div class="col-content">
-          <span class="col-label">Pilihan Akomodasi</span>
+          <span class="col-label">Tipe Kamar</span>
           <select class="col-input" x-model="tipeKamar" style="font-weight: 700;">
-            <option value="Standar">Suite Standar (Rp 300.000)</option>
-            <option value="Deluxe">Villa Eksekutif (Rp 550.000)</option>
-            <option value="Suite">Penthouse Presidensial (Rp 950.000)</option>
+            <option value="Standar">Standar (Rp 300.000)</option>
+            <option value="Deluxe">Deluxe (Rp 550.000)</option>
+            <option value="Suite">Suite (Rp 950.000)</option>
           </select>
         </div>
       </div>
@@ -204,9 +201,9 @@
           <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
         </svg>
         <div class="col-content">
-          <span class="col-label">Ketersediaan Kamar</span>
+          <span class="col-label">Ketersediaan Saat Ini</span>
           <span class="col-input" style="display: flex; align-items: center; font-weight: 700; color: #065F46;">
-            {{ $kamarTersedia ?? 7 }} Kamar Siap Ditempati
+            {{ $kamarTersedia ?? 0 }} dari {{ $totalKamar ?? 14 }} Kamar Siap Masuk
           </span>
         </div>
       </div>
@@ -223,73 +220,63 @@
   </div>
 
   <!-- ========================================================================
-       BAGIAN 2: Filosofi & Metrik Operasional Langsung (Live Counting)
+       BAGIAN 2: Informasi Praktis Menginap
        ======================================================================== -->
   <section class="sc-philosophy-section" id="philosophy">
-    <div class="sc-philosophy-box" data-sc-in>
-      <span class="eyebrow">Keunggulan Operasional</span>
+    <div class="sc-philosophy-box">
+      <span class="eyebrow">Informasi Menginap</span>
       
       <h2 class="sc-philosophy-lead">
-        "Setiap ruang dirancang dengan perpaduan wibawa modern dan kehangatan personal, menghadirkan peristirahatan yang melampaui ekspektasi."
+        Kamar dicek bersih sebelum tamu masuk, dan kuitansi atau voucher langsung keluar setelah transaksi.
       </h2>
 
-      <p style="color: var(--gold-600); font-weight: 600; font-size: 1.15rem; max-width: 680px; margin: 0 auto 3rem auto; line-height: 1.6;">
-        Diorkestrasi oleh arsitektur operasional real-time: inspeksi kebersihan kamar tervalidasi sebelum Anda tiba.
+      <p style="color: var(--gold-600); font-weight: 600; font-size: 1.05rem; max-width: 680px; margin: 0 auto 2.5rem auto; line-height: 1.6;">
+        Data ketersediaan kamar, meja resepsionis, dan bagian kebersihan terhubung dalam satu jadwal agar tidak ada pemesanan ganda.
       </p>
 
-      <!-- Kotak Metrik Operasional dengan Animasi Berhitung Live -->
-      <div class="sc-metrics-strip" data-sc-in data-sc-stagger="120">
-        <div class="sc-metric-card" data-sc-tilt="6">
-          <div class="sc-metric-val">
-            <span data-sc-count="0 100" data-sc-count-ms="1400">0</span>%
-          </div>
-          <div class="sc-metric-lbl">Standar Higienis Terverifikasi</div>
+      <div class="sc-metrics-strip">
+        <div class="sc-metric-card">
+          <div class="sc-metric-val">14.00 / 12.00</div>
+          <div class="sc-metric-lbl">Jam Check-In &amp; Check-Out Harian</div>
         </div>
-        <div class="sc-metric-card" data-sc-tilt="6">
-          <div class="sc-metric-val">
-            &lt; <span data-sc-count="0 3" data-sc-count-ms="1200">0</span> Menit
-          </div>
-          <div class="sc-metric-lbl">Rata-Rata Layanan Masuk (Check-In)</div>
+        <div class="sc-metric-card">
+          <div class="sc-metric-val">{{ $totalKamar ?? 14 }} Unit</div>
+          <div class="sc-metric-lbl">Pilihan Standar, Deluxe, dan Suite</div>
         </div>
-        <div class="sc-metric-card" data-sc-tilt="6">
-          <div class="sc-metric-val">
-            24/7
-          </div>
-          <div class="sc-metric-lbl">Layanan Butler &amp; Pendampingan 24 Jam</div>
+        <div class="sc-metric-card">
+          <div class="sc-metric-val">Tunai &amp; QRIS</div>
+          <div class="sc-metric-lbl">Bayar di Kasir atau Lewat Kode QR</div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ========================================================================
-       BAGIAN 3: Katalog Pilihan Kamar Suite (Animasi Bertingkat / Staggered)
+       BAGIAN 3: Katalog Pilihan Kamar
        ======================================================================== -->
   <section class="section-suites" id="suites">
-    <div class="section-head-center" data-sc-in>
-      <span class="eyebrow">Pilihan Akomodasi</span>
+    <div class="section-head-center">
+      <span class="eyebrow">Daftar Tipe Kamar</span>
       <h2 class="section-title">
-        Suite Privat &amp; <span class="script-accent">Peristirahatan</span>
+        Pilihan Kamar <span class="script-accent">ZSL Residence</span>
       </h2>
       <p class="section-desc">
-        Koleksi peristirahatan mewah yang memadukan kayu jati hangat, marmer alami, dan kemudahan cerdas.
+        Setiap tarif sudah termasuk sarapan pagi untuk tamu terdaftar, akses Wi-Fi, dan air mineral harian.
       </p>
     </div>
 
-    <div class="suites-grid" data-sc-in data-sc-stagger="140">
+    <div class="suites-grid">
       
-      <!-- Suite 1: Suite Deluxe Standar -->
-      <article class="suite-card" data-sc-tilt="6">
+      <!-- Tipe 1: Kamar Standar -->
+      <article class="suite-card">
         <div class="suite-photo-wrapper">
-          <img src="{{ asset('storage/rooms/demo-suite-1.png') }}" alt="Suite Deluxe Standar" class="suite-photo" onerror="this.src='https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=800&q=80'">
-          <span class="suite-tag-pill">Lantai 1 &bull; Unit 101-103</span>
-          <button class="suite-wishlist-btn" aria-label="Simpan ke daftar favorit">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-          </button>
+          <img src="{{ asset('images/rooms/demo-suite-1.png') }}" alt="Kamar Standar ZSL Residence" class="suite-photo">
+          <span class="suite-tag-pill">Lantai 1 &bull; Kamar 101–105</span>
         </div>
         <div class="suite-card-body">
-          <h3 class="suite-title">Suite Deluxe Standar</h3>
+          <h3 class="suite-title">Kamar Standar</h3>
           <p class="suite-desc">
-            Ruang tenang bernuansa kayu jati dengan tempat tidur Queen-size, pancuran air marmer, dan meja kerja ergonomis.
+            Kamar nyaman dengan ranjang Queen, AC, Smart TV, meja kerja, serta kamar mandi shower air panas.
           </p>
           <div class="specs-strip">
             <div class="spec-item">
@@ -298,7 +285,7 @@
             </div>
             <div class="spec-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 19h20M2 5v14M22 5v14M2 9h20"></path></svg>
-              <span>1 Tempat Tidur Queen</span>
+              <span>1 Ranjang Queen</span>
             </div>
             <div class="spec-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
@@ -310,26 +297,23 @@
               <span class="price-val">Rp 300.000</span>
               <span class="price-unit">/malam &bull; Termasuk Sarapan</span>
             </div>
-            <button type="button" @click="mulaiBooking('Standar')" class="btn-circle-arrow" aria-label="Pesan Suite Deluxe Standar" style="border: none; cursor: pointer;">
+            <button type="button" @click="mulaiBooking('Standar')" class="btn-circle-arrow" aria-label="Pesan Kamar Standar" style="border: none; cursor: pointer;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
           </div>
         </div>
       </article>
 
-      <!-- Suite 2: Villa Eksekutif Tepi Laut -->
-      <article class="suite-card" data-sc-tilt="6">
+      <!-- Tipe 2: Kamar Deluxe -->
+      <article class="suite-card">
         <div class="suite-photo-wrapper">
-          <img src="{{ asset('storage/rooms/demo-suite-2.png') }}" alt="Villa Eksekutif Tepi Laut" class="suite-photo" onerror="this.src='https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80'">
-          <span class="suite-tag-pill">Lantai 2 &bull; Unit 201-203</span>
-          <button class="suite-wishlist-btn" aria-label="Simpan ke daftar favorit">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-          </button>
+          <img src="{{ asset('images/rooms/demo-suite-2.png') }}" alt="Kamar Deluxe ZSL Residence" class="suite-photo">
+          <span class="suite-tag-pill">Lantai 2 &bull; Kamar 201–205</span>
         </div>
         <div class="suite-card-body">
-          <h3 class="suite-title">Villa Eksekutif Tepi Laut</h3>
+          <h3 class="suite-title">Kamar Deluxe</h3>
           <p class="suite-desc">
-            Balkon privat yang menghadap pemandangan senja, bathtub teraso terbuka, minibar pilihan, dan tata suara terintegrasi.
+            Ruang lebih lapang dengan ranjang King, balkon pribadi, minibar, pembuat kopi, serta kamar mandi bathtub dan shower.
           </p>
           <div class="specs-strip">
             <div class="spec-item">
@@ -338,7 +322,7 @@
             </div>
             <div class="spec-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 19h20M2 5v14M22 5v14M2 9h20"></path></svg>
-              <span>1 Tempat Tidur King</span>
+              <span>1 Ranjang King</span>
             </div>
             <div class="spec-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
@@ -348,28 +332,25 @@
           <div class="suite-card-footer">
             <div class="price-box">
               <span class="price-val">Rp 550.000</span>
-              <span class="price-unit">/malam &bull; Sajian Teh Sore</span>
+              <span class="price-unit">/malam &bull; Sarapan &amp; Minibar</span>
             </div>
-            <button type="button" @click="mulaiBooking('Deluxe')" class="btn-circle-arrow" aria-label="Pesan Villa Eksekutif Tepi Laut" style="border: none; cursor: pointer;">
+            <button type="button" @click="mulaiBooking('Deluxe')" class="btn-circle-arrow" aria-label="Pesan Kamar Deluxe" style="border: none; cursor: pointer;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
           </div>
         </div>
       </article>
 
-      <!-- Suite 3: Penthouse Presidensial -->
-      <article class="suite-card" data-sc-tilt="6">
+      <!-- Tipe 3: Kamar Suite -->
+      <article class="suite-card">
         <div class="suite-photo-wrapper">
-          <img src="{{ asset('storage/rooms/demo-suite-3.png') }}" alt="Penthouse Presidensial" class="suite-photo" onerror="this.src='https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80'">
-          <span class="suite-tag-pill">Penthouse &bull; Unit 301-302</span>
-          <button class="suite-wishlist-btn" aria-label="Simpan ke daftar favorit">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-          </button>
+          <img src="{{ asset('images/rooms/demo-suite-3.png') }}" alt="Kamar Suite ZSL Residence" class="suite-photo">
+          <span class="suite-tag-pill">Lantai 3 &bull; Kamar 301–304</span>
         </div>
         <div class="suite-card-body">
-          <h3 class="suite-title">Penthouse Presidensial</h3>
+          <h3 class="suite-title">Kamar Suite Keluarga</h3>
           <p class="suite-desc">
-            Puncak kemewahan arsitektur dengan ruang tamu formal, kolam renang rendam privat, dan layanan butler berdedikasi.
+            Unit paling luas untuk keluarga atau rombongan dengan ruang duduk terpisah, meja makan, dan dua area tidur.
           </p>
           <div class="specs-strip">
             <div class="spec-item">
@@ -378,7 +359,7 @@
             </div>
             <div class="spec-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 19h20M2 5v14M22 5v14M2 9h20"></path></svg>
-              <span>Super King + 2 Twin Bed</span>
+              <span>1 King + 2 Single</span>
             </div>
             <div class="spec-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect></svg>
@@ -388,9 +369,9 @@
           <div class="suite-card-footer">
             <div class="price-box">
               <span class="price-val">Rp 950.000</span>
-              <span class="price-unit">/malam &bull; Layanan Butler &amp; Jamuan</span>
+              <span class="price-unit">/malam &bull; Ruang Tamu Terpisah</span>
             </div>
-            <button type="button" @click="mulaiBooking('Suite')" class="btn-circle-arrow" aria-label="Pesan Penthouse Presidensial" style="border: none; cursor: pointer;">
+            <button type="button" @click="mulaiBooking('Suite')" class="btn-circle-arrow" aria-label="Pesan Kamar Suite Keluarga" style="border: none; cursor: pointer;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
           </div>
@@ -401,35 +382,33 @@
   </section>
 
   <!-- ========================================================================
-       BAGIAN 4: Pelayanan Pilihan (Kotak Bento Bertingkat)
+       BAGIAN 4: Fasilitas & Layanan Hotel
        ======================================================================== -->
   <section class="section-story" id="story">
-    <div class="section-head-center" data-sc-in>
-      <span class="eyebrow">Keramahan Khas</span>
+    <div class="section-head-center">
+      <span class="eyebrow">Layanan Tamu</span>
       <h2 class="section-title">
-        Kenyamanan Sempurna dengan <span class="script-accent">Pelayanan Presisi</span>
+        Proses Menginap yang <span class="script-accent">Jelas dan Praktis</span>
       </h2>
       <p class="section-desc">
-        Setiap detik menginap diorkestrasi secara harmonis. Dari sanitasi kamar bersertifikasi hingga layanan pendamping tamu personal yang peka terhadap setiap preferensi Anda.
+        Dari pemesanan mandiri hingga pengembalian kunci saat check-out, semua tercatat rapi di sistem meja depan.
       </p>
     </div>
 
-    <div class="values-grid" data-sc-in data-sc-stagger="120">
-      <!-- Layanan 1: Kebersihan Kamar -->
-      <div class="value-card" data-sc-tilt="5">
+    <div class="values-grid">
+      <div class="value-card">
         <div class="value-icon-box">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
           </svg>
         </div>
-        <h3 class="value-title">Kebersihan Kamar Presisi</h3>
+        <h3 class="value-title">Kamar Dicek Sebelum Check-In</h3>
         <p class="value-desc">
-          Status kebersihan kamar diverifikasi langsung melalui sistem operasional sebelum kunci diserahkan kepada Anda.
+          Kunci hanya diserahkan untuk kamar berstatus bersih setelah petugas tata graha menyelesaikan pembersihan.
         </p>
       </div>
 
-      <!-- Layanan 2: Gastronomi -->
-      <div class="value-card" data-sc-tilt="5">
+      <div class="value-card">
         <div class="value-icon-box">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
@@ -439,43 +418,42 @@
             <line x1="14" y1="1" x2="14" y2="4"></line>
           </svg>
         </div>
-        <h3 class="value-title">Sajian Gastronomi Istimewa</h3>
+        <h3 class="value-title">Termasuk Sarapan &amp; Wi-Fi</h3>
         <p class="value-desc">
-          Nikmati hidangan istimewa racikan koki eksekutif langsung dari kenyamanan ruang makan privat di dalam kamar Anda.
+          Semua unit dilengkapi sarapan pagi harian, perlengkapan mandi, air mineral, serta koneksi internet gratis.
         </p>
       </div>
 
-      <!-- Layanan 3: Layanan Butler -->
-      <div class="value-card" data-sc-tilt="5">
+      <div class="value-card">
         <div class="value-icon-box">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"></circle>
             <polyline points="12 6 12 12 16 14"></polyline>
           </svg>
         </div>
-        <h3 class="value-title">Layanan Butler Pribadi</h3>
+        <h3 class="value-title">Resepsionis Siaga 24 Jam</h3>
         <p class="value-desc">
-          Layanan butler 24 jam yang siap membantu setiap detail perjalanan, reservasi khusus, hingga kebutuhan relaksasi malam hari.
+          Butuh datang lebih malam, pembatalan jadwal, atau kuitansi cetak? Staf meja depan siap membantu kapan saja.
         </p>
       </div>
     </div>
   </section>
 
   <!-- ========================================================================
-       BAGIAN 5: Banner Undangan Malam (Midnight Navy Scale Reveal)
+       BAGIAN 5: Ajakan Reservasi
        ======================================================================== -->
-  <section class="cta-banner-wrapper" data-sc-in="scale">
+  <section class="cta-banner-wrapper">
     <div class="cta-banner">
       <div class="cta-banner-inner">
-        <span class="eyebrow" style="color: var(--gold-300);">Layanan Reservasi Khusus</span>
+        <span class="eyebrow" style="color: var(--gold-300);">Reservasi Langsung</span>
         <h2 class="cta-title">
-          Pesan Liburan Tak Terlupakan Anda <span class="script-accent-gold">Malam Ini</span>
+          Siap Memesan Kamar <span class="script-accent-gold">Hari Ini?</span>
         </h2>
         <p class="cta-desc">
-          Nikmati tarif eksklusif pemesanan langsung, jamuan selamat datang saat check-in, dan jaminan kamar dengan pemandangan terbaik.
+          Masuk atau daftar akun tamu dalam satu menit untuk memilih tanggal, mengecek ketersediaan unit, dan mencetak voucher booking.
         </p>
-        <button type="button" @click="mulaiBooking()" class="btn-pill-gold" data-sc-magnet="0.25" style="border: none; cursor: pointer;">
-          <span>Pesan Langsung Sekarang</span>
+        <button type="button" @click="mulaiBooking()" class="btn-pill-gold" style="border: none; cursor: pointer;">
+          <span>Pesan Kamar Sekarang</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
       </div>
@@ -517,11 +495,11 @@
   <!-- ========================================================================
        Kaki Halaman (Lumina Footer)
        ======================================================================== -->
-  <footer id="footer" class="lumina-footer" data-sc-in>
+  <footer id="footer" class="lumina-footer">
     <div class="footer-inner">
       <div class="footer-brand">
         <img src="{{ asset('brand/zsl-residence/lockups/zsl-logo-horizontal-on-dark.svg') }}" alt="ZSL Residence" style="height: 56px; width: auto; display: block;">
-        <p style="color: #8C97A8; font-size: 0.8rem; margin-top: 8px;">Standar Kemewahan Modern yang Hangat</p>
+        <p style="color: #8C97A8; font-size: 0.8rem; margin-top: 8px;">Kenyamanan Menginap untuk Kerja dan Keluarga</p>
       </div>
       <div style="display: flex; gap: 2rem; font-size: 0.82rem;">
         <span style="color: var(--gold-400);">zikri +6282259258947</span>
@@ -565,12 +543,12 @@
 
       <!-- 2 Tombol Aksi: Masuk & Daftar -->
       <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
-        <a href="{{ route('login', ['redirect' => 'booking']) }}" class="btn-booking-submit" style="text-decoration: none;">
+        <a :href="'{{ route('login') }}?redirect=booking' + (bookingQuery() ? '&' + bookingQuery() : '')" class="btn-booking-submit" style="text-decoration: none;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
           <span>Masuk ke Akun Saya</span>
         </a>
 
-        <a href="{{ route('register', ['redirect' => 'booking']) }}" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 0.85rem 1.5rem; background: #fff; color: var(--navy-900); border: 2px solid var(--navy-900); border-radius: var(--radius-pill); font-weight: 800; font-size: 0.88rem; text-decoration: none; transition: all 0.2s ease;">
+        <a :href="'{{ route('register') }}?redirect=booking' + (bookingQuery() ? '&' + bookingQuery() : '')" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 0.85rem 1.5rem; background: #fff; color: var(--navy-900); border: 2px solid var(--navy-900); border-radius: var(--radius-pill); font-weight: 800; font-size: 0.88rem; text-decoration: none; transition: all 0.2s ease;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
           <span>Daftar Akun Tamu Baru</span>
         </a>
@@ -607,21 +585,9 @@
     </div>
   </div>
 
-  <!-- Script Runtime ScrollCraft -->
-  <script src="{{ asset('js/scrollcraft.js') }}"></script>
-  
-  <!-- Pengendali Interaksi Gulir & Parallax -->
+  <!-- Penanda Bagian Aktif Navigasi Atas -->
   <script>
     (function() {
-      // 1. Jalankan Runtime Interaktif ScrollCraft
-      if (window.ScrollCraft && typeof window.ScrollCraft.mount === 'function') {
-        window.ScrollCraft.mount();
-      }
-
-      var progressBar = document.getElementById('scroll-progress');
-      var scrollCue = document.getElementById('scroll-cue');
-      var planeFar = document.getElementById('hero-plane-far');
-      var planeMid = document.getElementById('hero-plane-mid');
       var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-links a[href^="#"]'));
       var navSections = navLinks.map(function(link) {
         var target = document.querySelector(link.getAttribute('href'));
@@ -644,8 +610,9 @@
         });
       });
 
-      function updateActiveSection(scrollY) {
+      function updateActiveSection() {
         if (!navSections.length) return;
+        var scrollY = window.pageYOffset || document.documentElement.scrollTop;
         var activeId = navSections[0].id;
         var triggerLine = 180;
 
@@ -662,39 +629,8 @@
         setActiveNav(activeId);
       }
 
-      function onScroll() {
-        var scrollY = window.pageYOffset || document.documentElement.scrollTop;
-        var docHeight = document.documentElement.scrollHeight - window.innerHeight;
-        
-        // 2. Perbarui Bilah Progres Emas Puncak Layar
-        if (progressBar && docHeight > 0) {
-          var progress = Math.min(Math.max((scrollY / docHeight) * 100, 0), 100);
-          progressBar.style.width = progress + '%';
-        }
-
-        // 3. Sembunyikan / Tampilkan Penanda Gulir
-        if (scrollCue) {
-          if (scrollY > 60) {
-            scrollCue.classList.add('is-hidden');
-          } else {
-            scrollCue.classList.remove('is-hidden');
-          }
-        }
-
-        // 4. Pergerakan Kedalaman Parallax Lapisan Hero
-        if (planeFar && scrollY < window.innerHeight * 1.5) {
-          planeFar.style.transform = 'translate3d(0, ' + (scrollY * 0.28) + 'px, 0)';
-        }
-        if (planeMid && scrollY < window.innerHeight * 1.5) {
-          planeMid.style.transform = 'translate3d(0, ' + (scrollY * 0.14) + 'px, 0)';
-        }
-
-        // 5. Perbarui Indikator Aktif Navigasi Atas
-        updateActiveSection(scrollY);
-      }
-
-      window.addEventListener('scroll', onScroll, { passive: true });
-      onScroll();
+      window.addEventListener('scroll', updateActiveSection, { passive: true });
+      updateActiveSection();
     })();
   </script>
 </body>
