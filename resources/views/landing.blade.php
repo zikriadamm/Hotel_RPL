@@ -530,7 +530,6 @@
     </div>
     <div class="footer-copyright">
       <p>&copy; {{ date('Y') }} ZSL Residence Hotel &amp; Resor. Sistem Manajemen Operasional Hotel.</p>
-      <p style="color: #4C566A;">Ditenagai oleh Mesin Interaksi Scroll-Craft &bull; Laravel 10</p>
     </div>
   </footer>
 
