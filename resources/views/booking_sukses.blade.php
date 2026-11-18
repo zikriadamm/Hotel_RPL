@@ -140,7 +140,7 @@
             <h4 class="font-bold text-navy-900 text-xs uppercase tracking-wider">Petunjuk &amp; Ketentuan Check-In:</h4>
             <p>&bull; Harap membawa dan memperlihatkan kartu identitas resmi (KTP / Paspor) yang sesuai dengan nama pemesan.</p>
             <p>&bull; Pembayaran tagihan dapat diselesaikan langsung di meja resepsionis saat kedatangan (Tunai, Debit/Kredit, atau QRIS).</p>
-            <p>&bull; Layanan bantuan Concierge 24 Jam: <strong>+62 812 3456 7890</strong> atau email ke <strong>layanan@zslresidence.com</strong>.</p>
+            <p>&bull; Layanan bantuan Concierge 24 Jam: <strong>zikri +6282259258947</strong> atau email ke <strong>layanan@zslresidence.com</strong>.</p>
         </div>
 
         <!-- Footer Seal -->

@@ -524,7 +524,7 @@
         <p style="color: #8C97A8; font-size: 0.8rem; margin-top: 8px;">Standar Kemewahan Modern yang Hangat</p>
       </div>
       <div style="display: flex; gap: 2rem; font-size: 0.82rem;">
-        <span style="color: var(--gold-400);">Layanan Tamu (Concierge): +62 812 3456 7890</span>
+        <span style="color: var(--gold-400);">zikri +6282259258947</span>
         <span>layanan@zslresidence.com</span>
       </div>
     </div>
