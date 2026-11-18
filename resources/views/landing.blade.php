@@ -146,9 +146,6 @@
           <span>Lihat Pilihan Kamar</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
-        <a href="#booking" class="btn-pill-navy" style="background: rgba(10, 21, 38, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2);">
-          <span>Cek Jadwal Menginap</span>
-        </a>
       </div>
     </div>
   </section>
