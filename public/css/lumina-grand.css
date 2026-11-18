@@ -861,11 +861,6 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
     height: auto;
     padding: 4rem 1.5rem 6rem 1.5rem;
   }
-  .sc-metrics-strip {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    margin-top: 2.25rem;
-  }
 }
 
 
@@ -1053,6 +1048,14 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   gap: 1.75rem;
   margin-top: 3.5rem;
   width: 100%;
+}
+
+@media (max-width: 900px) {
+  .sc-metrics-strip {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 2.25rem;
+  }
 }
 
 .sc-metric-card {
