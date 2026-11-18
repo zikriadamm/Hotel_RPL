@@ -13,7 +13,7 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Yellowtail&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Yellowtail&display=swap" rel="stylesheet">
   
   <!-- ScrollCraft Engine Runtime Styles -->
   <link rel="stylesheet" href="{{ asset('css/scrollcraft.css') }}">
@@ -184,16 +184,16 @@
         </svg>
         <div class="col-content">
           <span class="col-label">Tanggal Menginap</span>
-          <div style="display: flex; gap: 8px;">
-            <input type="date" class="col-input" x-model="checkIn" min="{{ date('Y-m-d') }}">
-            <span style="color: var(--gold-600);">&rarr;</span>
-            <input type="date" class="col-input" x-model="checkOut" :min="checkIn">
+          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+            <input type="date" class="col-input" style="flex: 1; min-width: 112px;" x-model="checkIn" min="{{ date('Y-m-d') }}">
+            <span style="color: var(--gold-600); flex-shrink: 0;">&rarr;</span>
+            <input type="date" class="col-input" style="flex: 1; min-width: 112px;" x-model="checkOut" :min="checkIn">
           </div>
         </div>
       </div>
 
       <!-- Kolom 3: Status Unit -->
-      <div class="floating-col">
+      <div class="floating-col" style="border-bottom: none;">
         <svg class="col-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
           <circle cx="9" cy="7" r="4"></circle>
@@ -202,8 +202,8 @@
         </svg>
         <div class="col-content">
           <span class="col-label">Ketersediaan Saat Ini</span>
-          <span class="col-input" style="display: flex; align-items: center; font-weight: 700; color: #065F46;">
-            {{ $kamarTersedia ?? 0 }} dari {{ $totalKamar ?? 14 }} Kamar Siap Masuk
+          <span class="col-input" style="display: flex; align-items: center; font-weight: 700; color: #065F46; white-space: nowrap;">
+            {{ $kamarTersedia ?? 0 }}/{{ $totalKamar ?? 14 }} Kamar Siap
           </span>
         </div>
       </div>
@@ -388,7 +388,7 @@
     <div class="section-head-center">
       <span class="eyebrow">Layanan Tamu</span>
       <h2 class="section-title">
-        Proses Menginap yang <span class="script-accent">Jelas dan Praktis</span>
+        Proses Menginap yang <span class="script-accent" style="white-space: nowrap;">Jelas &amp; Praktis</span>
       </h2>
       <p class="section-desc">
         Dari pemesanan mandiri hingga pengembalian kunci saat check-out, semua tercatat rapi di sistem meja depan.
@@ -402,7 +402,7 @@
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
           </svg>
         </div>
-        <h3 class="value-title">Kamar Dicek Sebelum Check-In</h3>
+        <h3 class="value-title">Kamar Dicek Sebelum <span style="white-space: nowrap;">Check-In</span></h3>
         <p class="value-desc">
           Kunci hanya diserahkan untuk kamar berstatus bersih setelah petugas tata graha menyelesaikan pembersihan.
         </p>
@@ -447,7 +447,7 @@
       <div class="cta-banner-inner">
         <span class="eyebrow" style="color: var(--gold-300);">Reservasi Langsung</span>
         <h2 class="cta-title">
-          Siap Memesan Kamar <span class="script-accent-gold">Hari Ini?</span>
+          Siap Memesan Kamar <span class="script-accent-gold" style="white-space: nowrap;">Hari Ini?</span>
         </h2>
         <p class="cta-desc">
           Masuk atau daftar akun tamu dalam satu menit untuk memilih tanggal, mengecek ketersediaan unit, dan mencetak voucher booking.

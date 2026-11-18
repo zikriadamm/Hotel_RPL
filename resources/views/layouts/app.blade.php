@@ -10,10 +10,10 @@
     <link rel="manifest" href="{{ asset('site.webmanifest') }}">
     <meta name="theme-color" content="#0F1D38">
     
-    <!-- Google Fonts: Plus Jakarta Sans & Yellowtail -->
+    <!-- Google Fonts: Manrope & Yellowtail -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Yellowtail&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Yellowtail&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS CDN with Lumina Grand Config -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -22,7 +22,7 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                        sans: ['"Manrope"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
                         script: ['"Yellowtail"', 'cursive'],
                     },
                     colors: {
